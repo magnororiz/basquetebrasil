@@ -95,7 +95,8 @@ img{max-width:100%}
 <script src="assets/bb.js"></script>
 <script>
 bbMontar('Calendário');
-let DADOS = null;
+let DADOS = null; let NARRADOR_LOGADO = false;
+try { if (sessionStorage.getItem('bb_token')) bbApi({ acao: 'eu', token: sessionStorage.getItem('bb_token') }).then(r => { NARRADOR_LOGADO = !!(r && r.ok); }); } catch (e) {}
 const chave = x => String(x == null ? '' : x).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
 const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
 const hojeNum = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.getMonth() + 1) * 100 + h.getDate(); })();
@@ -165,44 +166,69 @@ function metade(j, clube, rotulo) {
     (p ? '<span class="pos">' + bbEsc(p.pos) + 'º lugar' + (p.grupo ? ' · ' + bbEsc(p.grupo) : '') + '</span>' : '<span class="pos sem">[posição não publicada pela federação]</span>') + '</div>';
 }
 let ultimoFoco = null;
+/* Duas janelas diferentes: jogo AGENDADO (a realizar) e jogo REALIZADO */
+const rot = (t, cor) => '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:' + (cor || '#4A5675') + '">' + t + '</div>';
+function topo(j, selo) {
+  return '<div class="jtopo"><div><div id="jTitulo" class="h" style="font-size:24px;font-weight:700">' + bbEsc(j.cat) + ' · ' + bbEsc(j.camp) + '</div>' +
+    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
+    '<div style="display:flex;gap:10px;align-items:center">' + selo + '<button class="fechar" type="button" aria-label="Fechar">×</button></div></div>';
+}
+function info(j, sit) {
+  return '<div class="info"><div><b>Data</b>' + bbEsc(nomeDia(j.data)) + '</div><div><b>Horário</b>' + bbEsc(j.hora || '[não informado pela fonte]') + '</div>' +
+    '<div><b>Local</b>' + bbEsc(j.local || '[não informado pela fonte]') + '</div><div><b>Situação</b>' + bbEsc(sit) + '</div></div>';
+}
+function rodapeFonte(j) {
+  return '<div class="fonte">Fonte: ' + bbEsc(j.fed) + (j.fonte ? ' · <a href="' + bbEsc(j.fonte.split(' ')[0]) + '" target="_blank" rel="noopener">ver origem</a>' : '') +
+    '<br>Última atualização na fonte: ' + bbEsc(j.atu || 'não informado pela fonte') + ' · Data da coleta: ' + bbEsc(j.coleta || '—') + '</div>';
+}
+function formLink(titulo, texto) {
+  return '<div class="video"><div>' + rot(titulo, '#7A5C00') + '<div>' + texto + '</div></div>' +
+    '<button class="bt abrirForn" type="button">Fornecer link</button>' +
+    '<form class="forn" hidden><input type="url" inputmode="url" placeholder="Cole aqui o link do YouTube" required aria-label="Link do YouTube"><button class="bt" type="submit">Enviar</button>' +
+    '<div class="fornMsg" style="width:100%;font-size:14px" role="status"></div></form></div>';
+}
+function janelaAgendado(j) {
+  const n = DADOS.narradores[j.id], vd = DADOS.videos[j.id];
+  const link = n && /^https:\/\//.test(n.link) ? n.link : (vd ? vd.link : '');
+  return topo(j, '<span class="selo" style="background:#FFDF00;color:#002776">Agendado</span>') +
+    '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' +
+    '<div class="resultado"><div class="pl" style="color:#8A94AD">0 x 0</div><div style="font-weight:600;color:#4A5675">Jogo ainda não realizado</div></div>' +
+    info(j, j.sit && !/realiz/i.test(j.sit) ? j.sit : 'Agendado') +
+    (n ? '<div class="narr com"><div>' + rot('Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
+         (link ? '<a class="assistir" href="' + bbEsc(link) + '" target="_blank" rel="noopener noreferrer">▶ Assistir a transmissão<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
+       : '<div class="narr sem"><div>' + rot('Narrador') + '<div>Nenhum narrador contratado para este jogo.</div></div>' +
+         (NARRADOR_LOGADO ? '<a class="bt" href="narrador.html#marcar" style="text-decoration:none;background:#00752C">Eu serei o narrador deste jogo</a>'
+                          : '<a href="narrador.html" style="font-weight:600;font-size:14px">É narrador? Entre na área do narrador</a>') + '</div>') +
+    rodapeFonte(j);
+}
+function janelaRealizado(j) {
+  const n = DADOS.narradores[j.id], vd = DADOS.videos[j.id], w = vencedor(j);
+  const nlink = n && /^https:\/\//.test(n.link) ? n.link : '';
+  const res = w ? '<div class="resultado"><div class="pl">' + bbEsc(j.pm) + ' x ' + bbEsc(j.pv) + '</div><div style="font-weight:700;color:#00752C">' +
+      bbEsc(w === 'e' ? 'Empate' : 'Vitória: ' + (w === 'm' ? j.mand : j.vis)) + '</div></div>'
+    : '<div class="resultado"><div style="font-weight:600;color:#4A5675">[placar não publicado pela federação]</div></div>';
+  return topo(j, '<span class="selo" style="background:#E7F5EC;color:#00752C">Realizado</span>') +
+    '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' + res +
+    info(j, 'Realizado') +
+    (n ? '<div class="narr com"><div>' + rot('Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
+         (nlink ? '<a class="assistir" href="' + bbEsc(nlink) + '" target="_blank" rel="noopener noreferrer">▶ Ver a narração<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
+       : '<div class="narr sem"><div>' + rot('Narrador') + '<div>Nenhum narrador registrado neste jogo.</div></div>' +
+         (NARRADOR_LOGADO ? '<a class="bt" href="narrador.html#marcar" style="text-decoration:none;background:#00752C">Eu fui o narrador deste jogo</a>' : '') + '</div>') +
+    (vd ? '<div class="video tem"><div>' + rot('Vídeo do jogo', '#002776') + '<div>' + bbEsc(vd.titulo || '') + (vd.canal ? ' · ' + bbEsc(vd.canal) : '') + '</div></div>' +
+          '<a class="assistir" href="' + bbEsc(vd.link) + '" target="_blank" rel="noopener noreferrer">▶ Ver o vídeo<span class="dica">Abre no YouTube</span></a></div>'
+        : (nlink ? '' : formLink('Vídeo do jogo', 'Link não encontrado.'))) + rodapeFonte(j);
+}
 function abrir(id) {
   const j = DADOS.jogos.find(x => x.id === id); if (!j) return;
   ultimoFoco = document.activeElement;
-  const n = DADOS.narradores[j.id]; const pl = j.pm !== '' && j.pv !== '';
-  const link = n && /^https:\/\//.test(n.link) ? n.link : '';
-  janela.innerHTML = '<div class="jtopo"><div><div id="jTitulo" class="h" style="font-size:24px;font-weight:700">' + bbEsc(j.cat) + ' · ' + bbEsc(j.camp) + '</div>' +
-    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
-    '<button class="fechar" type="button" aria-label="Fechar">×</button></div>' +
-    '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' +
-    (pl ? '<div class="resultado"><div class="pl">' + bbEsc(j.pm) + ' x ' + bbEsc(j.pv) + '</div><div style="font-weight:700;color:#00752C">' +
-      bbEsc(vencedor(j) === 'e' ? 'Empate' : 'Vitória: ' + (vencedor(j) === 'm' ? j.mand : j.vis)) + '</div></div>' : '') +
-    '<div class="info"><div><b>Data</b>' + bbEsc(nomeDia(j.data)) + '</div><div><b>Horário</b>' + bbEsc(j.hora || '[não informado pela fonte]') + '</div>' +
-    '<div><b>Local</b>' + bbEsc(j.local || '[não informado pela fonte]') + '</div>' + (j.sit ? '<div><b>Situação</b>' + bbEsc(j.sit) + '</div>' : '') + '</div>' +
-    (n ? '<div class="narr com"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#00752C">Narrador</div><div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
-      (link ? '<a class="assistir" href="' + bbEsc(link) + '" target="_blank" rel="noopener noreferrer">▶ Assistir a transmissão<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
-      : '<div class="narr sem"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Narrador</div><div>Nenhum narrador contratado para este jogo.</div></div>' +
-      (realizado(j) ? '' : '<a href="narrador.html" style="font-weight:600">Sou narrador deste jogo</a>') + '</div>') +
-    blocoVideo(j) +
-    '<div class="fonte">Fonte: ' + bbEsc(j.fed) + (j.fonte ? ' · <a href="' + bbEsc(j.fonte.split(' ')[0]) + '" target="_blank" rel="noopener">ver origem</a>' : '') +
-    '<br>Última atualização na fonte: ' + bbEsc(j.atu || 'não informado pela fonte') + ' · Data da coleta: ' + bbEsc(j.coleta || '—') + '</div>';
+  janela.innerHTML = realizado(j) ? janelaRealizado(j) : janelaAgendado(j);
   fundo.classList.add('aberto'); janela.querySelector('.fechar').focus();
   const bf = janela.querySelector('.abrirForn'); if (bf) bf.addEventListener('click', () => { janela.querySelector('.forn').hidden = false; bf.hidden = true; janela.querySelector('.forn input').focus(); });
-  const fe = janela.querySelector('.forn'); if (fe) fe.addEventListener('submit', async e => { e.preventDefault(); const m = janela.querySelector('.fornMsg'); m.textContent = 'Conferindo o vídeo…';
+  const fe = janela.querySelector('.forn'); if (fe) fe.addEventListener('submit', async e => { e.preventDefault(); const m = janela.querySelector('.fornMsg'); m.textContent = 'Conferindo o link…';
     const r = await bbApi({ acao: 'sugerirLink', id: j.id, link: fe.querySelector('input').value });
     m.textContent = r.ok ? r.msg : r.erro; m.style.color = r.ok ? '#00752C' : '#A01616';
     if (r.ok && r.aprovado) { const r2 = await bbApi({ acao: 'calendario' }); if (r2.ok) { DADOS = r2; DADOS.videos = r2.videos || {}; desenhar(); abrir(j.id); } } });
   janela.querySelector('.fechar').addEventListener('click', fechar);
-}
-function blocoVideo(j) {
-  if (!realizado(j)) return '';
-  const vd = DADOS.videos[j.id], n = DADOS.narradores[j.id];
-  if (vd) return '<div class="video tem"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#002776">Vídeo do jogo</div><div>' + bbEsc(vd.titulo || '') + (vd.canal ? ' · ' + bbEsc(vd.canal) : '') + '</div></div>' +
-    '<a class="assistir" href="' + bbEsc(vd.link) + '" target="_blank" rel="noopener noreferrer">▶ Ver o vídeo<span class="dica">Abre no YouTube</span></a></div>';
-  if (n && /^https:\/\//.test(n.link)) return '';
-  return '<div class="video"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7A5C00">Vídeo do jogo</div><div>Link não encontrado.</div></div>' +
-    '<button class="bt abrirForn" type="button">Fornecer link</button>' +
-    '<form class="forn" hidden><input type="url" inputmode="url" placeholder="Cole aqui o link do YouTube" required aria-label="Link do vídeo no YouTube"><button class="bt" type="submit">Enviar</button>' +
-    '<div class="fornMsg" style="width:100%;font-size:14px" role="status"></div></form></div>';
 }
 function fechar() { fundo.classList.remove('aberto'); if (ultimoFoco) ultimoFoco.focus(); }
 fundo.addEventListener('click', e => { if (e.target === fundo) fechar(); });

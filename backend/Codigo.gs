@@ -286,12 +286,17 @@ function conferirVideo(j, info) {
   const nota = [a ? 'mandante ✓' : 'mandante ✗', b ? 'visitante ✓' : 'visitante ✗', catOk ? 'categoria ✓' : 'categoria ✗', dataOk ? 'data ✓' : 'data ✗'].join(', ');
   return { aprovado: a && b && (catOk || dataOk), nota: nota };
 }
+function jogoRealizado(j) {
+  const m = String(j.data).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); const hoje = Number(Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyyMMdd'));
+  return (j.pm !== '' && j.pv !== '') || /realiz|encerr|finaliz/i.test(j.sit) || (m && Number(m[3] + m[2] + m[1]) < hoje);
+}
 function sugerirLink(id, link) {
   const c = CacheService.getScriptCache(); const n = Number(c.get('sug_min') || 0);
   if (n > 30) return { ok: false, erro: 'Muitos envios agora. Tente de novo em alguns minutos.' }; c.put('sug_min', String(n + 1), 60);
   link = norm(link); const vid = idYoutube(link);
   if (!vid) return { ok: false, erro: 'Mande um link do YouTube (youtube.com ou youtu.be).' };
   const j = jogoPorId(id); if (!j) return { ok: false, erro: 'Jogo não encontrado no calendário.' };
+  if (!jogoRealizado(j)) return { ok: false, erro: 'Só dá para enviar link de jogo que já aconteceu. O link de jogo agendado é colocado pelo narrador.' };
   const sh = abaN('Videos'); const v = sh.getLastRow() > 1 ? sh.getDataRange().getDisplayValues().slice(1) : [];
   if (v.some(r => r[0] === id && idYoutube(r[2]) === vid)) return { ok: false, erro: 'Esse link já foi enviado para este jogo. Obrigado!' };
   if (v.some(r => r[0] === id && r[6] === 'Aprovado')) return { ok: false, erro: 'Este jogo já tem vídeo. Obrigado!' };

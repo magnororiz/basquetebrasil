@@ -69,10 +69,11 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#4A5675;bo
 <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn cinza" href="calendario.html">Ver calendário</a><button id="bSair" class="btn cinza" type="button">Sair</button></div>
 </div>
 
-<div class="card">
-<h2 class="h">Marcar jogo em que fui contratado</h2>
+<div class="card" id="marcar">
+<h2 class="h">Marcar jogo que eu narro ou narrei</h2>
 <p style="margin:0 0 16px;color:#4A5675">Escolha o jogo e informe o link onde ele vai ser transmitido. Seu nome aparece no calendário e o público clica para assistir.</p>
 <div class="grade">
+<label>Jogos<select id="mPer"><option value="prox">Jogos a realizar</option><option value="real">Jogos realizados (que já narrei)</option></select></label>
 <label>Estado<select id="mUf"><option value="">Todos</option></select></label>
 <label>Categoria<select id="mCat"><option value="">Todas</option></select></label>
 </div>
@@ -115,7 +116,7 @@ bbMontar('');
 const $ = id => document.getElementById(id);
 const tok = { get: () => { try { return sessionStorage.getItem('bb_token') || ''; } catch (e) { return window._t || ''; } },
   set: v => { try { v ? sessionStorage.setItem('bb_token', v) : sessionStorage.removeItem('bb_token'); } catch (e) { window._t = v; } } };
-let EU = null, CAL = null;
+let EU = null, CAL = null, TODOS = [];
 function msg(id, r) { const m = $(id); m.className = 'msg ' + (r.ok ? 'ok' : 'erro'); m.textContent = r.ok ? (r.msg || 'Pronto.') : (r.erro || 'Erro.'); }
 function ver(v) { ['vLogin', 'vTroca', 'vPainel'].forEach(x => $(x).classList.toggle('oculto', x !== v)); }
 async function api(d) { return bbApi(Object.assign({ token: tok.get() }, d)); }
@@ -151,8 +152,12 @@ const hoje = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.
 async function carregarJogos() {
   const r = await bbApi({ acao: 'calendario' });
   if (!r.ok) { $('mJogo').innerHTML = '<option value="">' + bbEsc(r.erro) + '</option>'; return; }
-  CAL = r.jogos.filter(j => dataNum(j.data) >= hoje && !(j.pm !== '' && j.pv !== '')).sort((a, b) => dataNum(a.data) - dataNum(b.data) || String(a.hora).localeCompare(b.hora));
-  CAL.forEach(j => j.narr = r.narradores[j.id]);
+  TODOS = r.jogos; TODOS.forEach(j => j.narr = r.narradores[j.id]); filtrarPer();
+}
+function filtrarPer() {
+  const real = $('mPer').value === 'real';
+  CAL = TODOS.filter(j => real === (dataNum(j.data) < hoje || (j.pm !== '' && j.pv !== '')));
+  CAL.sort((a, b) => real ? (dataNum(b.data) - dataNum(a.data)) : (dataNum(a.data) - dataNum(b.data) || String(a.hora).localeCompare(b.hora)));
   $('mUf').length = 1; $('mCat').length = 1;
   [...new Set(CAL.map(j => j.uf))].sort().forEach(u => $('mUf').add(new Option(u, u)));
   [...new Set(CAL.map(j => j.cat))].sort((a, b) => a.localeCompare(b, 'pt', { numeric: true })).forEach(c => $('mCat').add(new Option(c, c)));
@@ -163,9 +168,9 @@ function listarOpcoes() {
   const js = CAL.filter(j => (!uf || j.uf === uf) && (!cat || j.cat === cat));
   $('mJogo').innerHTML = js.length ? '<option value="">Escolha o jogo</option>' + js.map(j => '<option value="' + bbEsc(j.id) + '">' +
     bbEsc(j.data + ' ' + (j.hora || '') + ' · ' + j.uf + ' ' + j.cat + ' · ' + j.mand + ' x ' + j.vis + (j.narr ? ' (narrador: ' + j.narr.nome + ')' : '')) + '</option>').join('')
-    : '<option value="">Nenhum jogo futuro publicado pelas federações</option>';
+    : '<option value="">Nenhum jogo publicado pelas federações nesse filtro</option>';
 }
-$('mUf').addEventListener('change', listarOpcoes); $('mCat').addEventListener('change', listarOpcoes);
+$('mPer').addEventListener('change', filtrarPer); $('mUf').addEventListener('change', listarOpcoes); $('mCat').addEventListener('change', listarOpcoes);
 $('bMarcar').addEventListener('click', async () => {
   if (!$('mJogo').value) return msg('mMarcar', { ok: false, erro: 'Escolha o jogo.' });
   const r = await api({ acao: 'marcarJogo', id: $('mJogo').value, link: $('mLink').value }); msg('mMarcar', r);
