@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendário · Basquete Brasil</title>
+<meta name="description" content="Calendário dos jogos do basquete de base publicados pelas federações estaduais, com local, posição dos times e narrador da transmissão.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#0B1B3F;background:#F4F6FA}
+a{color:#00752C}a:hover{color:#005A22}
+.h{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.01em}
+img{max-width:100%}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.filtros{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.filtros label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675}
+.filtros select,.filtros input{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D3EA;border-radius:8px;background:#FFFFFF;color:#0B1B3F;min-width:160px}
+.dia{margin:28px 0 10px;font-size:22px;font-weight:700;color:#002776}
+.jogo{width:100%;display:grid;grid-template-columns:92px 1fr auto;gap:14px;align-items:center;text-align:left;background:#FFFFFF;border:1px solid #E3E7EF;border-radius:12px;padding:14px 16px;margin:0 0 10px;cursor:pointer;font:inherit;color:inherit}
+.jogo:hover,.jogo:focus-visible{border-color:#009C3B;box-shadow:0 2px 10px rgba(0,39,118,.08);outline:none}
+.hora{font-weight:700;font-size:18px}
+.cat{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;background:#EEF1F6;color:#002776;border-radius:999px;padding:3px 10px;margin-top:4px}
+.times{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-weight:600;font-size:16px}
+.times .x{color:#8A94AD;font-weight:500}
+.placar{font-family:"Barlow Condensed",Inter,sans-serif;font-size:20px;font-weight:700;color:#002776}
+.sub{font-size:13px;color:#4A5675;margin-top:4px}
+.selo{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;white-space:nowrap}
+.selo.n{background:#E7F5EC;color:#00752C}.selo.v{background:#F4F6FA;color:#8A94AD}
+.escudo{width:28px;height:28px;object-fit:contain;flex:none}
+.semlogo{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#EEF1F6;color:#8A94AD;font-size:9px;font-weight:700;flex:none}
+.fundo{position:fixed;inset:0;background:rgba(0,26,82,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.fundo.aberto{display:flex}
+.janela{background:#FFFFFF;border-radius:16px;width:100%;max-width:760px;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.jtopo{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#002776;color:#FFFFFF;padding:14px 20px}
+.fechar{min-width:44px;min-height:44px;border:0;border-radius:8px;background:#0F3175;color:#FFFFFF;font-size:22px;cursor:pointer}
+.metades{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #E3E7EF}
+.metade{padding:22px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.metade+.metade{border-left:1px solid #E3E7EF}
+.metade .rot{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4A5675}
+.metade .nome{font-size:20px;font-weight:700}
+.metade img{width:84px;height:84px;object-fit:contain}
+.metade .semlogo{width:84px;height:84px;font-size:13px}
+.pos{font-size:14px;color:#0B1B3F;background:#FFF8CC;border-radius:8px;padding:6px 10px}
+.pos.sem{background:#F4F6FA;color:#8A94AD}
+.info{padding:18px 20px;display:grid;gap:10px;font-size:15px}
+.info b{color:#4A5675;font-weight:600;display:inline-block;min-width:110px}
+.narr{margin:0 20px 18px;border-radius:12px;padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.narr.com{background:#E7F5EC}.narr.sem{background:#F4F6FA;color:#4A5675}
+.assistir{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:8px;background:#00752C;color:#FFFFFF;font-weight:700;text-decoration:none}
+.assistir:hover{background:#005A22;color:#FFFFFF}
+.assistir .dica{position:absolute;bottom:calc(100% + 8px);right:0;background:#0B1B3F;color:#FFFFFF;font-size:12px;font-weight:500;padding:6px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.assistir:hover .dica,.assistir:focus-visible .dica{opacity:1}
+.fonte{padding:0 20px 20px;font-size:12px;color:#8A94AD;line-height:1.6}
+.aviso{background:#FFFFFF;border:1px solid #E3E7EF;border-radius:12px;padding:24px;color:#4A5675}
+@media (max-width:640px){.jogo{grid-template-columns:70px 1fr}.jogo .selo{grid-column:1/-1;justify-self:start}.metades{grid-template-columns:1fr}.metade+.metade{border-left:0;border-top:1px solid #E3E7EF}}
+</style>
+</head>
+<body>
+<div id="bb-menu"></div>
+
+<section style="background:#00752C;color:#FFFFFF">
+<div class="wrap" style="padding:40px 24px 44px">
+<h1 class="h" style="margin:0;font-size:52px;line-height:1;font-weight:800">Calendário</h1>
+<p style="margin:12px 0 0;font-size:17px;line-height:1.55;color:#E6ECF7;max-width:760px">Jogos do basquete de base publicados pelas federações estaduais. Clique num jogo para ver local, posição dos times e o narrador da transmissão.</p>
+<p id="fontes" style="margin:10px 0 0;font-size:14px;color:#C9F2D6"></p>
+</div>
+</section>
+
+<main class="wrap" style="padding:28px 24px 56px">
+<div class="filtros" role="search">
+<label>Estado<select id="fUf"><option value="">Todos</option></select></label>
+<label>Categoria<select id="fCat"><option value="">Todas</option></select></label>
+<label>Jogos<select id="fPer"><option value="prox">Próximos</option><option value="real">Já realizados</option><option value="todos">Todos</option></select></label>
+<label>Clube<input id="fClube" type="search" placeholder="Digite o nome"></label>
+</div>
+<div id="lista" aria-live="polite" style="margin-top:8px"><p class="aviso">Carregando o calendário…</p></div>
+</main>
+
+<div class="fundo" id="fundo" role="dialog" aria-modal="true" aria-labelledby="jTitulo">
+<div class="janela" id="janela"></div>
+</div>
+
+<div id="bb-rodape"></div>
+<script src="assets/bb.js"></script>
+<script>
+bbMontar('Calendário');
+let DADOS = null;
+const chave = x => String(x == null ? '' : x).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
+const hojeNum = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.getMonth() + 1) * 100 + h.getDate(); })();
+const DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+function nomeDia(d) { const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); const dt = new Date(+m[3], +m[2] - 1, +m[1]); return DIAS[dt.getDay()] + ', ' + d; }
+function realizado(j) { return /realizado|encerrado|finalizado/i.test(j.sit) || (j.pm !== '' && j.pv !== '') || dataNum(j.data) < hojeNum; }
+function logo(j, clube, grande) {
+  const src = bbEscudo(j.uf, clube);
+  return src ? '<img class="escudo" src="' + src + '" alt="Escudo ' + bbEsc(clube) + '">' : '<span class="semlogo" aria-label="Sem logo">[logo]</span>';
+}
+function posicao(j, clube) { return DADOS.posicoes[[j.uf, chave(j.cat), chave(clube)].join('|')]; }
+
+async function iniciar() {
+  const r = await bbApi({ acao: 'calendario' });
+  if (!r.ok) { document.getElementById('lista').innerHTML = '<p class="aviso">' + bbEsc(r.erro || 'Não foi possível carregar o calendário.') + '</p>'; return; }
+  DADOS = r;
+  document.getElementById('fontes').textContent = r.fontes.length ? 'Fontes no calendário: ' + r.fontes.join(', ') + ' · atualizado em ' + r.gerado : '';
+  const ufs = [...new Set(r.jogos.map(j => j.uf))].sort(), cats = [...new Set(r.jogos.map(j => j.cat))].sort((a, b) => a.localeCompare(b, 'pt', { numeric: true }));
+  ufs.forEach(u => fUf.add(new Option(u, u))); cats.forEach(c => fCat.add(new Option(c, c)));
+  if (!r.jogos.some(j => !realizado(j))) fPer.value = 'real';
+  [fUf, fCat, fPer].forEach(e => e.addEventListener('change', desenhar)); fClube.addEventListener('input', desenhar);
+  desenhar();
+}
+function desenhar() {
+  const uf = fUf.value, cat = fCat.value, per = fPer.value, cl = chave(fClube.value);
+  let js = DADOS.jogos.filter(j => (!uf || j.uf === uf) && (!cat || j.cat === cat) && (per === 'todos' || (per === 'real') === realizado(j)) && (!cl || chave(j.mand).includes(cl) || chave(j.vis).includes(cl)));
+  js.sort((a, b) => (dataNum(a.data) - dataNum(b.data)) || String(a.hora).localeCompare(b.hora));
+  if (per === 'real') js.reverse();
+  const el = document.getElementById('lista');
+  if (!js.length) { el.innerHTML = '<p class="aviso">Nenhum jogo encontrado com esses filtros.</p>'; return; }
+  let html = '', dia = '';
+  js.forEach(j => {
+    if (j.data !== dia) { dia = j.data; html += '<h2 class="dia h">' + bbEsc(nomeDia(dia)) + '</h2>'; }
+    const n = DADOS.narradores[j.id]; const pl = j.pm !== '' && j.pv !== '';
+    html += '<button class="jogo" type="button" data-id="' + bbEsc(j.id) + '">' +
+      '<div><div class="hora">' + bbEsc(j.hora || '—') + '</div><span class="cat">' + bbEsc(j.uf + ' · ' + j.cat) + '</span></div>' +
+      '<div><div class="times">' + logo(j, j.mand) + '<span>' + bbEsc(j.mand) + '</span>' + (pl ? '<span class="placar">' + bbEsc(j.pm) + '</span>' : '') +
+      '<span class="x">x</span>' + (pl ? '<span class="placar">' + bbEsc(j.pv) + '</span>' : '') + '<span>' + bbEsc(j.vis) + '</span>' + logo(j, j.vis) + '</div>' +
+      '<div class="sub">' + bbEsc([j.camp, j.local].filter(Boolean).join(' · ')) + '</div></div>' +
+      (n ? '<span class="selo n">🎙 ' + bbEsc(n.nome) + '</span>' : '<span class="selo v">Sem narrador</span>') + '</button>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.jogo').forEach(b => b.addEventListener('click', () => abrir(b.dataset.id)));
+}
+function metade(j, clube, rotulo) {
+  const p = posicao(j, clube); const src = bbEscudo(j.uf, clube);
+  return '<div class="metade"><span class="rot">' + rotulo + '</span>' +
+    (src ? '<img src="' + src + '" alt="Escudo ' + bbEsc(clube) + '">' : '<span class="semlogo">[logo]</span>') +
+    '<span class="nome">' + bbEsc(clube) + '</span>' +
+    (p ? '<span class="pos">' + bbEsc(p.pos) + 'º lugar' + (p.grupo ? ' · ' + bbEsc(p.grupo) : '') + '</span>' : '<span class="pos sem">[posição não publicada pela federação]</span>') + '</div>';
+}
+let ultimoFoco = null;
+function abrir(id) {
+  const j = DADOS.jogos.find(x => x.id === id); if (!j) return;
+  ultimoFoco = document.activeElement;
+  const n = DADOS.narradores[j.id]; const pl = j.pm !== '' && j.pv !== '';
+  const link = n && /^https:\/\//.test(n.link) ? n.link : '';
+  janela.innerHTML = '<div class="jtopo"><div><div id="jTitulo" class="h" style="font-size:24px;font-weight:700">' + bbEsc(j.cat) + ' · ' + bbEsc(j.camp) + '</div>' +
+    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
+    '<button class="fechar" type="button" aria-label="Fechar">×</button></div>' +
+    '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' +
+    (pl ? '<div style="text-align:center;padding:14px;font-family:\'Barlow Condensed\',Inter,sans-serif;font-size:34px;font-weight:800;color:#002776;border-bottom:1px solid #E3E7EF">' + bbEsc(j.pm) + ' x ' + bbEsc(j.pv) + '</div>' : '') +
+    '<div class="info"><div><b>Data</b>' + bbEsc(nomeDia(j.data)) + '</div><div><b>Horário</b>' + bbEsc(j.hora || '[não informado pela fonte]') + '</div>' +
+    '<div><b>Local</b>' + bbEsc(j.local || '[não informado pela fonte]') + '</div>' + (j.sit ? '<div><b>Situação</b>' + bbEsc(j.sit) + '</div>' : '') + '</div>' +
+    (n ? '<div class="narr com"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#00752C">Narrador</div><div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
+      (link ? '<a class="assistir" href="' + bbEsc(link) + '" target="_blank" rel="noopener noreferrer">▶ Assistir a transmissão<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
+      : '<div class="narr sem"><div><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Narrador</div><div>Nenhum narrador contratado para este jogo.</div></div>' +
+      '<a href="narrador.html" style="font-weight:600">Sou narrador deste jogo</a></div>') +
+    '<div class="fonte">Fonte: ' + bbEsc(j.fed) + (j.fonte ? ' · <a href="' + bbEsc(j.fonte.split(' ')[0]) + '" target="_blank" rel="noopener">ver origem</a>' : '') +
+    '<br>Última atualização na fonte: ' + bbEsc(j.atu || 'não informado pela fonte') + ' · Data da coleta: ' + bbEsc(j.coleta || '—') + '</div>';
+  fundo.classList.add('aberto'); janela.querySelector('.fechar').focus();
+  janela.querySelector('.fechar').addEventListener('click', fechar);
+}
+function fechar() { fundo.classList.remove('aberto'); if (ultimoFoco) ultimoFoco.focus(); }
+fundo.addEventListener('click', e => { if (e.target === fundo) fechar(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && fundo.classList.contains('aberto')) fechar(); });
+iniciar();
+</script>
+</body>
+</html>

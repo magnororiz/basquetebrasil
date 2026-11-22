@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cadastro de narrador · Basquete Brasil</title>
+<meta name="description" content="Peça seu cadastro de narrador parceiro do Basquete Brasil.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#0B1B3F;background:#F4F6FA}
+a{color:#00752C}a:hover{color:#005A22}
+.h{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.01em}
+.card{background:#FFFFFF;border:1px solid #E3E7EF;border-radius:14px;padding:28px;max-width:560px}
+label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#4A5675;margin-bottom:16px}
+label small{font-weight:400;color:#8A94AD}
+input{font:inherit;font-size:16px;min-height:46px;padding:0 12px;border:1px solid #C9D3EA;border-radius:8px;background:#FFFFFF;color:#0B1B3F}
+input:focus{outline:2px solid #009C3B;outline-offset:1px}
+.check{flex-direction:row;align-items:flex-start;gap:10px;font-weight:400;color:#0B1B3F;line-height:1.5}
+.check input{min-height:auto;width:20px;height:20px;margin-top:2px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:8px;border:0;font:inherit;font-weight:700;cursor:pointer;background:#00752C;color:#FFFFFF;width:100%}
+.btn:hover{background:#005A22}.btn:disabled{opacity:.6;cursor:wait}
+.msg{border-radius:8px;padding:12px 14px;font-size:15px;margin-top:14px;display:none}
+.msg.ok{display:block;background:#E7F5EC;color:#00752C}.msg.erro{display:block;background:#FDECEC;color:#A01616}
+</style>
+</head>
+<body>
+<div id="bb-menu"></div>
+<main style="max-width:1100px;margin:0 auto;padding:36px 24px 56px;display:flex;flex-wrap:wrap;gap:32px">
+<div style="flex:1 1 300px;max-width:420px">
+<h1 class="h" style="margin:0 0 12px;font-size:46px;color:#002776;line-height:1">Seja narrador parceiro</h1>
+<p style="font-size:16px;line-height:1.6;color:#4A5675;margin:0 0 12px">Narradores parceiros marcam no nosso calendário os jogos em que foram contratados e divulgam o link da transmissão para o público.</p>
+<p style="font-size:16px;line-height:1.6;color:#4A5675;margin:0">Cada pedido é analisado pela equipe do Basquete Brasil. Quando for aprovado, você recebe por e-mail o login e uma senha provisória, que precisa ser trocada no primeiro acesso.</p>
+</div>
+<form id="f" class="card" style="flex:1 1 360px" novalidate>
+<label>Nome completo<input id="nome" autocomplete="name" required></label>
+<label>Nome de login <small>Pode ser seu nome artístico. Só letras minúsculas, números, ponto ou traço, sem espaço (ex.: magno, klaustv).</small><input id="login" autocapitalize="none" autocomplete="username" required></label>
+<label>CPF <small>Usado só para identificação e, no futuro, para cobrança. Não aparece no site.</small><input id="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required></label>
+<label>E-mail <small>É para cá que vai a senha provisória.</small><input id="email" type="email" autocomplete="email" required></label>
+<label>Canal onde você transmite <small>Opcional: link do YouTube, Instagram ou Facebook.</small><input id="canal" type="url" placeholder="https://" inputmode="url"></label>
+<label class="check"><input id="aceite" type="checkbox"><span>Autorizo o Basquete Brasil a guardar meu nome, CPF e e-mail para analisar o cadastro, dar acesso à área do narrador e, no futuro, fazer cobranças, conforme a Lei Geral de Proteção de Dados (LGPD). Posso pedir a exclusão dos meus dados a qualquer momento.</span></label>
+<button class="btn" id="enviar" type="submit">Enviar pedido</button>
+<div id="m" class="msg" role="alert"></div>
+<p style="font-size:14px;color:#4A5675;margin:16px 0 0">Já tem acesso? <a href="narrador.html">Entrar na área do narrador</a>.</p>
+</form>
+</main>
+<div id="bb-rodape"></div>
+<script src="assets/bb.js"></script>
+<script>
+bbMontar('Narradores');
+const $ = id => document.getElementById(id);
+$('cpf').addEventListener('input', e => { const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  e.target.value = d.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2'); });
+$('login').addEventListener('input', e => { e.target.value = e.target.value.toLowerCase().replace(/\s/g, ''); });
+$('f').addEventListener('submit', async e => {
+  e.preventDefault(); const m = $('m'); const b = $('enviar'); b.disabled = true;
+  const r = await bbApi({ acao: 'pedirCadastro', nome: $('nome').value, login: $('login').value, cpf: $('cpf').value, email: $('email').value, canal: $('canal').value, aceite: $('aceite').checked });
+  b.disabled = false; m.className = 'msg ' + (r.ok ? 'ok' : 'erro'); m.textContent = r.ok ? r.msg : r.erro;
+  if (r.ok) $('f').querySelectorAll('input').forEach(i => { if (i.type === 'checkbox') i.checked = false; else i.value = ''; });
+});
+</script>
+</body>
+</html>

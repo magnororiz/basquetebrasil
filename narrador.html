@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área do narrador · Basquete Brasil</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#0B1B3F;background:#F4F6FA}
+a{color:#00752C}a:hover{color:#005A22}
+.h{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.01em}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.card{background:#FFFFFF;border:1px solid #E3E7EF;border-radius:14px;padding:24px;margin-bottom:20px}
+.card h2{margin:0 0 14px;font-size:26px;color:#002776}
+label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#4A5675;margin-bottom:14px}
+input,select{font:inherit;font-size:16px;min-height:46px;padding:0 12px;border:1px solid #C9D3EA;border-radius:8px;background:#FFFFFF;color:#0B1B3F}
+input:focus,select:focus{outline:2px solid #009C3B;outline-offset:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:8px;border:0;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+.verde{background:#00752C;color:#FFFFFF}.verde:hover{background:#005A22}
+.azul{background:#002776;color:#FFFFFF}.amarelo{background:#FFDF00;color:#002776}
+.cinza{background:#EEF1F6;color:#0B1B3F}.vermelho{background:#FDECEC;color:#A01616}
+.msg{border-radius:8px;padding:12px 14px;font-size:15px;margin:10px 0;display:none}
+.msg.ok{display:block;background:#E7F5EC;color:#00752C}.msg.erro{display:block;background:#FDECEC;color:#A01616}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px 12px;font-size:14px;border-bottom:1px solid #EEF1F6;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#4A5675;border-bottom:2px solid #E3E7EF}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px}
+.oculto{display:none}
+.tabela{overflow-x:auto}
+</style>
+</head>
+<body>
+<div id="bb-menu"></div>
+
+<main class="wrap" style="padding:36px 24px 56px">
+<h1 class="h" style="margin:0 0 20px;font-size:46px;color:#002776">Área do narrador</h1>
+
+<!-- LOGIN -->
+<section id="vLogin" class="card oculto" style="max-width:440px">
+<h2 class="h">Entrar</h2>
+<form id="fLogin">
+<label>Login<input id="lUsuario" autocomplete="username" required></label>
+<label>Senha<input id="lSenha" type="password" autocomplete="current-password" required></label>
+<button class="btn verde" type="submit" style="width:100%">Entrar</button>
+</form>
+<div id="mLogin" class="msg" role="alert"></div>
+<p style="font-size:14px;color:#4A5675;margin:16px 0 0">Ainda não tem acesso? <a href="cadastro.html">Peça seu cadastro de narrador</a>.</p>
+</section>
+
+<!-- TROCA DE SENHA OBRIGATÓRIA -->
+<section id="vTroca" class="card oculto" style="max-width:440px">
+<h2 class="h">Crie sua senha</h2>
+<p style="margin:0 0 16px;color:#4A5675">No primeiro acesso é obrigatório trocar a senha provisória que chegou por e-mail.</p>
+<form id="fTroca">
+<label>Senha provisória<input id="tAtual" type="password" autocomplete="current-password" required></label>
+<label>Nova senha (mínimo 6 caracteres)<input id="tNova" type="password" autocomplete="new-password" minlength="6" required></label>
+<label>Repita a nova senha<input id="tNova2" type="password" autocomplete="new-password" minlength="6" required></label>
+<button class="btn verde" type="submit" style="width:100%">Salvar nova senha</button>
+</form>
+<div id="mTroca" class="msg" role="alert"></div>
+</section>
+
+<!-- PAINEL -->
+<section id="vPainel" class="oculto">
+<div class="card" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center">
+<div><div style="font-size:13px;color:#4A5675">Conectado como</div><div id="pNome" style="font-size:22px;font-weight:700"></div></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn cinza" href="calendario.html">Ver calendário</a><button id="bSair" class="btn cinza" type="button">Sair</button></div>
+</div>
+
+<div class="card">
+<h2 class="h">Marcar jogo em que fui contratado</h2>
+<p style="margin:0 0 16px;color:#4A5675">Escolha o jogo e informe o link onde ele vai ser transmitido. Seu nome aparece no calendário e o público clica para assistir.</p>
+<div class="grade">
+<label>Estado<select id="mUf"><option value="">Todos</option></select></label>
+<label>Categoria<select id="mCat"><option value="">Todas</option></select></label>
+</div>
+<label>Jogo<select id="mJogo"><option value="">Carregando jogos…</option></select></label>
+<label>Link da transmissão (YouTube, Instagram, Facebook…)<input id="mLink" type="url" placeholder="https://" inputmode="url"></label>
+<button id="bMarcar" class="btn verde" type="button">Marcar jogo</button>
+<div id="mMarcar" class="msg" role="alert"></div>
+</div>
+
+<div class="card">
+<h2 class="h">Meus jogos</h2>
+<div id="meus" class="tabela"><p style="color:#4A5675">Carregando…</p></div>
+</div>
+
+<div id="vDono" class="oculto">
+<div class="card">
+<h2 class="h">Pedidos de cadastro</h2>
+<p style="margin:0 0 12px;color:#4A5675">Ao aprovar, o sistema cria o login e envia a senha provisória para o e-mail do narrador. O CPF aparece mascarado; o número completo fica só na planilha privada.</p>
+<div id="pedidos" class="tabela"></div>
+<div id="mPedidos" class="msg" role="alert"></div>
+</div>
+<div class="card">
+<h2 class="h">Narradores</h2>
+<div id="usuarios" class="tabela"></div>
+</div>
+</div>
+</section>
+</main>
+
+<div id="bb-rodape"></div>
+<script src="assets/bb.js"></script>
+<script>
+bbMontar('');
+const $ = id => document.getElementById(id);
+const tok = { get: () => { try { return sessionStorage.getItem('bb_token') || ''; } catch (e) { return window._t || ''; } },
+  set: v => { try { v ? sessionStorage.setItem('bb_token', v) : sessionStorage.removeItem('bb_token'); } catch (e) { window._t = v; } } };
+let EU = null, CAL = null;
+function msg(id, r) { const m = $(id); m.className = 'msg ' + (r.ok ? 'ok' : 'erro'); m.textContent = r.ok ? (r.msg || 'Pronto.') : (r.erro || 'Erro.'); }
+function ver(v) { ['vLogin', 'vTroca', 'vPainel'].forEach(x => $(x).classList.toggle('oculto', x !== v)); }
+async function api(d) { return bbApi(Object.assign({ token: tok.get() }, d)); }
+
+async function iniciar() {
+  if (!bbApiPronta()) { ver('vLogin'); msg('mLogin', { ok: false, erro: 'O sistema ainda está sendo instalado. Volte em breve.' }); return; }
+  if (!tok.get()) return ver('vLogin');
+  const r = await api({ acao: 'eu' });
+  if (!r.ok) { tok.set(''); return ver('vLogin'); }
+  entrar(r.usuario);
+}
+function entrar(u) {
+  EU = u;
+  if (u.trocarSenha) return ver('vTroca');
+  ver('vPainel'); $('pNome').textContent = u.nome + (u.ehDono ? ' · administrador' : '');
+  $('vDono').classList.toggle('oculto', !u.ehDono);
+  carregarJogos(); carregarMeus(); if (u.ehDono) { carregarPedidos(); carregarUsuarios(); }
+}
+$('fLogin').addEventListener('submit', async e => {
+  e.preventDefault(); const r = await bbApi({ acao: 'login', usuario: $('lUsuario').value, senha: $('lSenha').value });
+  if (!r.ok) return msg('mLogin', r); tok.set(r.token); $('lSenha').value = ''; entrar(r.usuario);
+});
+$('fTroca').addEventListener('submit', async e => {
+  e.preventDefault();
+  if ($('tNova').value !== $('tNova2').value) return msg('mTroca', { ok: false, erro: 'As duas senhas novas não são iguais.' });
+  const r = await api({ acao: 'trocarSenha', senhaAtual: $('tAtual').value, senhaNova: $('tNova').value });
+  msg('mTroca', r); if (r.ok) { EU.trocarSenha = false; ['tAtual', 'tNova', 'tNova2'].forEach(x => $(x).value = ''); setTimeout(() => entrar(EU), 800); }
+});
+$('bSair').addEventListener('click', async () => { await api({ acao: 'sair' }); tok.set(''); EU = null; ver('vLogin'); });
+
+const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
+const hoje = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.getMonth() + 1) * 100 + h.getDate(); })();
+async function carregarJogos() {
+  const r = await bbApi({ acao: 'calendario' });
+  if (!r.ok) { $('mJogo').innerHTML = '<option value="">' + bbEsc(r.erro) + '</option>'; return; }
+  CAL = r.jogos.filter(j => dataNum(j.data) >= hoje && !(j.pm !== '' && j.pv !== '')).sort((a, b) => dataNum(a.data) - dataNum(b.data) || String(a.hora).localeCompare(b.hora));
+  CAL.forEach(j => j.narr = r.narradores[j.id]);
+  $('mUf').length = 1; $('mCat').length = 1;
+  [...new Set(CAL.map(j => j.uf))].sort().forEach(u => $('mUf').add(new Option(u, u)));
+  [...new Set(CAL.map(j => j.cat))].sort((a, b) => a.localeCompare(b, 'pt', { numeric: true })).forEach(c => $('mCat').add(new Option(c, c)));
+  listarOpcoes();
+}
+function listarOpcoes() {
+  const uf = $('mUf').value, cat = $('mCat').value;
+  const js = CAL.filter(j => (!uf || j.uf === uf) && (!cat || j.cat === cat));
+  $('mJogo').innerHTML = js.length ? '<option value="">Escolha o jogo</option>' + js.map(j => '<option value="' + bbEsc(j.id) + '">' +
+    bbEsc(j.data + ' ' + (j.hora || '') + ' · ' + j.uf + ' ' + j.cat + ' · ' + j.mand + ' x ' + j.vis + (j.narr ? ' (narrador: ' + j.narr.nome + ')' : '')) + '</option>').join('')
+    : '<option value="">Nenhum jogo futuro publicado pelas federações</option>';
+}
+$('mUf').addEventListener('change', listarOpcoes); $('mCat').addEventListener('change', listarOpcoes);
+$('bMarcar').addEventListener('click', async () => {
+  if (!$('mJogo').value) return msg('mMarcar', { ok: false, erro: 'Escolha o jogo.' });
+  const r = await api({ acao: 'marcarJogo', id: $('mJogo').value, link: $('mLink').value }); msg('mMarcar', r);
+  if (r.ok) { $('mLink').value = ''; carregarMeus(); carregarJogos(); }
+});
+async function carregarMeus() {
+  const r = await api({ acao: 'meusJogos' }); const el = $('meus');
+  if (!r.ok) { el.innerHTML = '<p class="msg erro" style="display:block">' + bbEsc(r.erro) + '</p>'; return; }
+  if (!r.jogos.length) { el.innerHTML = '<p style="color:#4A5675">Você ainda não marcou nenhum jogo.</p>'; return; }
+  el.innerHTML = '<table><thead><tr><th>Data</th><th>Jogo</th><th>Link</th><th></th></tr></thead><tbody>' + r.jogos.map(j =>
+    '<tr><td>' + bbEsc(j.data) + '</td><td>' + bbEsc(j.uf + ' ' + j.cat + ' · ' + j.mand + ' x ' + j.vis) + '</td><td><a href="' + bbEsc(j.link) + '" target="_blank" rel="noopener">abrir</a></td>' +
+    '<td><button class="btn vermelho" type="button" data-id="' + bbEsc(j.id) + '">Desmarcar</button></td></tr>').join('') + '</tbody></table>';
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+    if (!confirmar('Desmarcar este jogo? Seu nome sai do calendário.')) return;
+    const r2 = await api({ acao: 'desmarcarJogo', id: b.dataset.id }); msg('mMarcar', r2); carregarMeus(); carregarJogos();
+  }));
+}
+function confirmar(t) { return window.confirm(t); }
+async function carregarPedidos() {
+  const r = await api({ acao: 'listarPedidos' }); const el = $('pedidos');
+  if (!r.ok) { el.innerHTML = '<p>' + bbEsc(r.erro) + '</p>'; return; }
+  const ps = r.pedidos.slice().reverse();
+  if (!ps.length) { el.innerHTML = '<p style="color:#4A5675">Nenhum pedido ainda.</p>'; return; }
+  el.innerHTML = '<table><thead><tr><th>Data</th><th>Nome completo</th><th>Login</th><th>CPF</th><th>E-mail</th><th>Canal</th><th>Situação</th><th></th></tr></thead><tbody>' + ps.map(p =>
+    '<tr><td>' + bbEsc(p.data) + '</td><td>' + bbEsc(p.nome) + '</td><td>' + bbEsc(p.login) + '</td><td>' + bbEsc(p.cpf) + '</td><td>' + bbEsc(p.email) + '</td><td>' +
+    (/^https:\/\//.test(p.canal) ? '<a href="' + bbEsc(p.canal) + '" target="_blank" rel="noopener">abrir</a>' : bbEsc(p.canal || '—')) + '</td><td>' + bbEsc(p.situacao) + '</td><td>' +
+    (p.situacao === 'Pendente' ? '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn verde" data-a="aprovarPedido" data-l="' + p.linha + '">Aprovar</button><button class="btn vermelho" data-a="recusarPedido" data-l="' + p.linha + '">Recusar</button></div>' : '') +
+    '</td></tr>').join('') + '</tbody></table>';
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+    const aprovar = b.dataset.a === 'aprovarPedido';
+    if (!confirmar(aprovar ? 'Aprovar este narrador? Ele vai receber a senha provisória por e-mail.' : 'Recusar este pedido?')) return;
+    const r2 = await api({ acao: b.dataset.a, linha: Number(b.dataset.l) }); msg('mPedidos', r2); carregarPedidos(); carregarUsuarios();
+  }));
+}
+async function carregarUsuarios() {
+  const r = await api({ acao: 'listarUsuarios' }); const el = $('usuarios'); if (!r.ok) { el.innerHTML = bbEsc(r.erro); return; }
+  el.innerHTML = '<table><thead><tr><th>Login</th><th>Perfil</th><th>E-mail</th><th>Situação</th><th></th></tr></thead><tbody>' + r.usuarios.map(u =>
+    '<tr><td>' + bbEsc(u.usuario) + '</td><td>' + bbEsc(u.perfil) + '</td><td>' + bbEsc(u.email) + '</td><td>' + (u.ativo ? 'Ativo' : 'Desativado') + (u.trocarSenha ? ' · aguardando 1º acesso' : '') + '</td><td>' +
+    (u.perfil === 'Dono' ? '' : '<button class="btn ' + (u.ativo ? 'vermelho' : 'verde') + '" data-u="' + bbEsc(u.usuario) + '" data-v="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Ativar') + '</button>') + '</td></tr>').join('') + '</tbody></table>';
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+    const r2 = await api({ acao: 'ativarUsuario', usuario: b.dataset.u, ativo: b.dataset.v === '1' }); msg('mPedidos', r2); carregarUsuarios();
+  }));
+}
+iniciar();
+</script>
+</body>
+</html>
