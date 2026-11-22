@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scout Basket RJ Stats PRO 4.0 · Basquete Brasil</title>
+<title>Scout Basket Stats PRO 4.0 · Basquete Brasil</title>
 <meta name="description" content="O scout de basquete dos narradores parceiros: estatística ao vivo, súmula e página própria com a sua marca. Narrador que fornece estatísticas ganha desconto.">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +26,8 @@ a{color:#00752C}a:hover{color:#005A22}
 .card p{margin:0;color:#4A5675;line-height:1.55}
 .ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;background:#E7F5EC}
 .zoom{position:relative;border-radius:14px;overflow:hidden;background:#0B1B3F;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:#C9D3EA;text-align:center;padding:20px;border:3px solid #FFDF00}
+.zoom.foto{padding:0;background:#fff}
+.zoom.foto img{width:100%;height:100%;object-fit:contain;display:block}
 .zoom small{display:block;margin-top:8px;font-size:13px;color:#8A94AD}
 .zoom .tag{position:absolute;top:12px;left:12px;background:#FFDF00;color:#002776;font-size:12px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:999px}
 .passos{counter-reset:p;display:grid;gap:14px;margin:0;padding:0;list-style:none}
@@ -53,13 +55,13 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <section style="background:#002776;color:#FFFFFF">
 <div class="wrap" style="padding:64px 24px 72px;display:flex;flex-wrap:wrap;gap:40px;align-items:center">
 <div style="flex:1 1 520px;display:flex;flex-direction:column;gap:20px">
-<span style="align-self:flex-start;background:#FFDF00;color:#002776;font-weight:800;font-size:13px;letter-spacing:.08em;padding:6px 12px;border-radius:999px">SCOUT · BASKET RJ STATS PRO 4.0</span>
+<span style="align-self:flex-start;background:#FFDF00;color:#002776;font-weight:800;font-size:13px;letter-spacing:.08em;padding:6px 12px;border-radius:999px">SCOUT · BASKET STATS PRO 4.0</span>
 <h1 class="h" style="margin:0;font-size:60px;line-height:.98;font-weight:800">O scout que transforma a sua narração em estatística oficial</h1>
 <p style="margin:0;font-size:19px;line-height:1.55;color:#C9D3EA;max-width:600px">Marque cada ponto, rebote e assistência enquanto narra. A estatística sai ao vivo para o seu público, em 5 a 8 segundos, no aplicativo do seu canal, e entra no maior banco de dados do basquete de base do Brasil.</p>
 <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn amarelo" href="#planos">Quero o scout</a><a class="btn contorno" href="#desconto">Como ganhar desconto</a></div>
 </div>
 <div style="flex:1 1 360px">
-<div class="zoom"><span class="tag">ZOOM</span><div>[print: painel de um time com os jogadores e as estatísticas]<small>Recorte de uma parte da tela, não a página inteira</small></div></div>
+<div class="zoom foto"><span class="tag">ZOOM</span><img src="assets/scout/scout-zoom.jpg" alt="Painel de um time com os jogadores e as estatísticas de cada atleta" loading="lazy"></div>
 </div>
 </div>
 </section>
@@ -87,9 +89,9 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <h2 class="h">Um gostinho do scout</h2>
 <p class="lead">Alguns recortes da tela. O resto você conhece por dentro quando entrar.</p>
 <div class="grade">
-<div class="zoom"><span class="tag">TIME</span><div>[print: lista de um time com os números de cada atleta]</div></div>
+<div class="zoom foto"><span class="tag">TIME</span><img src="assets/scout/scout-time.jpg" alt="Lista de um time com os números de cada atleta" loading="lazy"></div>
 <div class="zoom"><span class="tag">BOTÕES</span><div>[print: alguns botões de lance (2P, 3P, rebote…)]</div></div>
-<div class="zoom"><span class="tag">AO VIVO</span><div>[print: placar ao vivo como o público vê]</div></div>
+<div class="zoom foto"><span class="tag">AO VIVO</span><img src="assets/scout/scout-aovivo.jpg" alt="Placar do jogo como o público vê" loading="lazy"></div>
 </div>
 </div>
 </section>
@@ -102,8 +104,8 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <ol class="passos">
 <li><div><b>Envie 10 estatísticas de jogos que você já narrou</b><span>Precisam ser jogos oficiais de uma federação estadual, que estejam no calendário da federação.</span></div></li>
 <li><div><b>Nós conferimos cada uma</b><span>O jogo tem que existir na tabela da federação, os atletas têm que ser inscritos na federação e o placar tem que bater com a soma dos pontos dos atletas e com o resultado oficial.</span></div></li>
-<li><div><b>A estatística precisa ter os nossos campos</b><span>Por atleta:</span>
-<ul class="chips"><li>PTS</li><li>2P</li><li>3P</li><li>LL</li><li>REB</li><li>AST</li><li>ROU</li><li>TOC</li><li>EF</li></ul></div></li>
+<li><div><b>A estatística precisa ter, no mínimo, estes campos</b><span>Por atleta:</span>
+<ul class="chips"><li>PTS</li><li>2P</li><li>3P</li><li>LL</li><li>REB</li><li>AST</li><li>ROU</li><li>TOC</li><li>ERR</li><li>FP</li><li>EF</li></ul></div></li>
 <li><div><b>Aprovou? Desconto liberado</b><span>Se as 10 estatísticas atenderem os requisitos, você ganha [percentual de desconto] na mensalidade.</span></div></li>
 <li><div><b>Compromisso de parceiro</b><span>Você se compromete a enviar todas as estatísticas que tiver e autoriza que as estatísticas geradas no scout sejam publicadas no banco de dados do Basquete Brasil.</span></div></li>
 </ol>
@@ -118,7 +120,7 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <p class="lead">Mensalidade simples, sem fidelidade.</p>
 <div class="planos">
 <div class="plano"><h3 class="h" style="margin:0;font-size:28px">Narrador</h3><div class="preco">[valor] <small style="font-size:18px;color:#4A5675">/mês</small></div>
-<ul><li>Scout Basket RJ Stats PRO 4.0</li><li>Estatística ao vivo com a sua marca (atraso de 5 a 8 segundos)</li><li>Aplicativo do seu canal para o público baixar</li><li>Seus jogos no calendário nacional</li></ul>
+<ul><li>Scout Basket Stats PRO 4.0</li><li>Estatística ao vivo com a sua marca (atraso de 5 a 8 segundos)</li><li>Aplicativo do seu canal para o público baixar</li><li>Seus jogos no calendário nacional</li></ul>
 <a class="btn verde" href="cadastro.html">Quero este plano</a></div>
 <div class="plano dest"><span class="selo">COM DESCONTO</span><h3 class="h" style="margin:0;font-size:28px">Narrador parceiro</h3><div class="preco">[valor com desconto] <small style="font-size:18px;color:#4A5675">/mês</small></div>
 <ul><li>Tudo do plano Narrador</li><li>Desconto por fornecer estatísticas aprovadas</li><li>Destaque como fonte de dados do Basquete Brasil</li></ul>
@@ -132,7 +134,7 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <div class="wrap" style="max-width:860px">
 <h2 class="h">Dúvidas</h2>
 <details><summary>Preciso de computador?</summary><p>[a confirmar: aparelhos em que o scout funciona]</p></details>
-<details><summary>Quais estatísticas servem para o desconto?</summary><p>Só de jogos oficiais de federação estadual, com os campos PTS, 2P, 3P, LL, REB, AST, ROU, TOC e EF por atleta, e que batam com o resultado oficial.</p></details>
+<details><summary>Quais estatísticas servem para o desconto?</summary><p>Só de jogos oficiais de federação estadual, com os campos PTS, 2P, 3P, LL, REB, AST, ROU, TOC, ERR, FP e EF por atleta, e que batam com o resultado oficial.</p></details>
 <details><summary>Minha estatística vai aparecer no site?</summary><p>Sim. Faz parte do acordo de parceiro: as estatísticas aprovadas entram no banco de dados do Basquete Brasil, com o crédito do seu canal.</p></details>
 <details><summary>Posso cancelar?</summary><p>[a confirmar: regra de cancelamento]</p></details>
 </div>
