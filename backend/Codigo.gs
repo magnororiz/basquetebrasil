@@ -38,7 +38,7 @@ function doPost(e) {
       case 'trocarSenha': return responder(trocarSenha(p.token, p.senhaAtual, p.senhaNova));
       case 'sair': CacheService.getScriptCache().remove('s_' + p.token); return responder({ ok: true });
       case 'meusJogos': return responder(meusJogos(p.token));
-      case 'marcarJogo': return responder(marcarJogo(p.token, p.id, p.link));
+      case 'marcarJogo': return responder(marcarJogo(p.token, p.id, p.link, p.papel));
       case 'desmarcarJogo': return responder(desmarcarJogo(p.token, p.id));
       case 'listarPedidos': return responder(listarPedidos(p.token));
       case 'aprovarPedido': return responder(aprovarPedido(p.token, p.linha));
@@ -100,7 +100,7 @@ function calendario() {
   });
   const narr = {};
   const sh = abaN('Contratacoes');
-  if (sh && sh.getLastRow() > 1) sh.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[7]) narr[r[0]] = { nome: r[7], link: r[8] }; });
+  if (sh && sh.getLastRow() > 1) sh.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[7]) narr[r[0]] = { nome: r[7], link: r[8], papel: r[10] || 'Narrador' }; });
   const videos = {};
   const sv = abaN('Videos');
   if (sv && sv.getLastRow() > 1) sv.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[2] && r[6] === 'Aprovado' && !videos[r[0]]) videos[r[0]] = { link: r[2], titulo: r[3], canal: r[4] }; });
@@ -201,9 +201,10 @@ function jogoPorId(id) { return (calendario().jogos || []).find(j => j.id === id
 function linhasContr() { const sh = abaN('Contratacoes'); return sh.getLastRow() > 1 ? sh.getDataRange().getDisplayValues().slice(1).map((r, i) => ({ linha: i + 2, r: r })) : []; }
 function meusJogos(token) {
   const u = daSessao(token); if (!u) return { ok: false, erro: 'Sessão expirada. Entre de novo.' };
-  return { ok: true, jogos: linhasContr().filter(x => x.r[6] === u.usuario).map(x => ({ id: x.r[0], uf: x.r[1], cat: x.r[2], data: x.r[3], mand: x.r[4], vis: x.r[5], link: x.r[8] })) };
+  return { ok: true, jogos: linhasContr().filter(x => x.r[6] === u.usuario).map(x => ({ id: x.r[0], uf: x.r[1], cat: x.r[2], data: x.r[3], mand: x.r[4], vis: x.r[5], link: x.r[8], papel: x.r[10] || 'Narrador' })) };
 }
-function marcarJogo(token, id, link) {
+const PAPEIS = { narrador: 'Narrador', canal: 'Canal (transmissão)', ambos: 'Narrador e canal' };
+function marcarJogo(token, id, link, papel) {
   const u = daSessao(token); if (!u) return { ok: false, erro: 'Sessão expirada. Entre de novo.' };
   if (u.trocar) return { ok: false, erro: 'Troque a senha provisória antes de continuar.' };
   link = norm(link); if (!/^https:\/\/\S+$/.test(link)) return { ok: false, erro: 'Informe o link da transmissão começando com https://' };
@@ -211,11 +212,12 @@ function marcarJogo(token, id, link) {
   const outro = linhasContr().find(x => x.r[0] === id && x.r[6] !== u.usuario);
   if (outro) return { ok: false, erro: 'Este jogo já tem narrador: ' + outro.r[7] + '. Fale com o Basquete Brasil se houver engano.' };
   const meu = linhasContr().find(x => x.r[0] === id && x.r[6] === u.usuario);
-  const linha = [id, j.uf, j.cat, j.data + (j.hora ? ' ' + j.hora : ''), j.mand, j.vis, u.usuario, u.nome, link, agora()];
+  const pp = PAPEIS[papel] || PAPEIS.narrador;
+  const linha = [id, j.uf, j.cat, j.data + (j.hora ? ' ' + j.hora : ''), j.mand, j.vis, u.usuario, u.nome, link, agora(), pp];
   const sh = abaN('Contratacoes');
   if (meu) sh.getRange(meu.linha, 1, 1, linha.length).setValues([linha]); else sh.appendRow(linha);
   limparCacheCalendario();
-  return { ok: true, msg: 'Jogo marcado. Seu nome já aparece no calendário.' };
+  return { ok: true, msg: 'Jogo marcado como ' + pp.toLowerCase() + '. Seu nome já aparece no calendário.' };
 }
 function desmarcarJogo(token, id) {
   const u = daSessao(token); if (!u) return { ok: false, erro: 'Sessão expirada. Entre de novo.' };

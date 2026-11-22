@@ -70,7 +70,7 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#4A5675;bo
 </div>
 
 <div class="card" id="marcar">
-<h2 class="h">Marcar jogo que eu narro ou narrei</h2>
+<h2 class="h">Marcar jogo como narrador ou canal</h2>
 <p style="margin:0 0 16px;color:#4A5675">Escolha o jogo e informe o link onde ele vai ser transmitido. Seu nome aparece no calendário e o público clica para assistir.</p>
 <div class="grade">
 <label>Jogos<select id="mPer"><option value="prox">Jogos a realizar</option><option value="real">Jogos realizados (que já narrei)</option></select></label>
@@ -78,6 +78,7 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#4A5675;bo
 <label>Categoria<select id="mCat"><option value="">Todas</option></select></label>
 </div>
 <label>Jogo<select id="mJogo"><option value="">Carregando jogos…</option></select></label>
+<label>Você neste jogo<select id="mPapel"><option value="narrador">Narrador</option><option value="canal">Canal que transmite (sem narração)</option><option value="ambos">Narrador e canal que transmite</option></select></label>
 <label>Link da transmissão (YouTube, Instagram, Facebook…)<input id="mLink" type="url" placeholder="https://" inputmode="url"></label>
 <button id="bMarcar" class="btn verde" type="button">Marcar jogo</button>
 <div id="mMarcar" class="msg" role="alert"></div>
@@ -117,6 +118,7 @@ const $ = id => document.getElementById(id);
 const tok = { get: () => { try { return sessionStorage.getItem('bb_token') || ''; } catch (e) { return window._t || ''; } },
   set: v => { try { v ? sessionStorage.setItem('bb_token', v) : sessionStorage.removeItem('bb_token'); } catch (e) { window._t = v; } } };
 let EU = null, CAL = null, TODOS = [];
+const JOGO_PEDIDO = new URLSearchParams(location.search).get('jogo') || '';
 function msg(id, r) { const m = $(id); m.className = 'msg ' + (r.ok ? 'ok' : 'erro'); m.textContent = r.ok ? (r.msg || 'Pronto.') : (r.erro || 'Erro.'); }
 function ver(v) { ['vLogin', 'vTroca', 'vPainel'].forEach(x => $(x).classList.toggle('oculto', x !== v)); }
 async function api(d) { return bbApi(Object.assign({ token: tok.get() }, d)); }
@@ -152,7 +154,11 @@ const hoje = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.
 async function carregarJogos() {
   const r = await bbApi({ acao: 'calendario' });
   if (!r.ok) { $('mJogo').innerHTML = '<option value="">' + bbEsc(r.erro) + '</option>'; return; }
-  TODOS = r.jogos; TODOS.forEach(j => j.narr = r.narradores[j.id]); filtrarPer();
+  TODOS = r.jogos; TODOS.forEach(j => j.narr = r.narradores[j.id]);
+  const ped = JOGO_PEDIDO && TODOS.find(j => j.id === JOGO_PEDIDO);
+  if (ped) $('mPer').value = (dataNum(ped.data) < hoje || (ped.pm !== '' && ped.pv !== '')) ? 'real' : 'prox';
+  filtrarPer();
+  if (ped) { $('mJogo').value = ped.id; $('marcar').scrollIntoView({ behavior: 'smooth' }); $('mPapel').focus(); }
 }
 function filtrarPer() {
   const real = $('mPer').value === 'real';
@@ -173,15 +179,15 @@ function listarOpcoes() {
 $('mPer').addEventListener('change', filtrarPer); $('mUf').addEventListener('change', listarOpcoes); $('mCat').addEventListener('change', listarOpcoes);
 $('bMarcar').addEventListener('click', async () => {
   if (!$('mJogo').value) return msg('mMarcar', { ok: false, erro: 'Escolha o jogo.' });
-  const r = await api({ acao: 'marcarJogo', id: $('mJogo').value, link: $('mLink').value }); msg('mMarcar', r);
+  const r = await api({ acao: 'marcarJogo', id: $('mJogo').value, link: $('mLink').value, papel: $('mPapel').value }); msg('mMarcar', r);
   if (r.ok) { $('mLink').value = ''; carregarMeus(); carregarJogos(); }
 });
 async function carregarMeus() {
   const r = await api({ acao: 'meusJogos' }); const el = $('meus');
   if (!r.ok) { el.innerHTML = '<p class="msg erro" style="display:block">' + bbEsc(r.erro) + '</p>'; return; }
   if (!r.jogos.length) { el.innerHTML = '<p style="color:#4A5675">Você ainda não marcou nenhum jogo.</p>'; return; }
-  el.innerHTML = '<table><thead><tr><th>Data</th><th>Jogo</th><th>Link</th><th></th></tr></thead><tbody>' + r.jogos.map(j =>
-    '<tr><td>' + bbEsc(j.data) + '</td><td>' + bbEsc(j.uf + ' ' + j.cat + ' · ' + j.mand + ' x ' + j.vis) + '</td><td><a href="' + bbEsc(j.link) + '" target="_blank" rel="noopener">abrir</a></td>' +
+  el.innerHTML = '<table><thead><tr><th>Data</th><th>Jogo</th><th>Papel</th><th>Link</th><th></th></tr></thead><tbody>' + r.jogos.map(j =>
+    '<tr><td>' + bbEsc(j.data) + '</td><td>' + bbEsc(j.uf + ' ' + j.cat + ' · ' + j.mand + ' x ' + j.vis) + '</td><td>' + bbEsc(j.papel) + '</td><td><a href="' + bbEsc(j.link) + '" target="_blank" rel="noopener">abrir</a></td>' +
     '<td><button class="btn vermelho" type="button" data-id="' + bbEsc(j.id) + '">Desmarcar</button></td></tr>').join('') + '</tbody></table>';
   el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
     if (!confirmar('Desmarcar este jogo? Seu nome sai do calendário.')) return;

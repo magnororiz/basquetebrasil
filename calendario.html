@@ -194,11 +194,10 @@ function janelaAgendado(j) {
     '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' +
     '<div class="resultado"><div class="pl" style="color:#8A94AD">0 x 0</div><div style="font-weight:600;color:#4A5675">Jogo ainda não realizado</div></div>' +
     info(j, j.sit && !/realiz/i.test(j.sit) ? j.sit : 'Agendado') +
-    (n ? '<div class="narr com"><div>' + rot('Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
+    (n ? '<div class="narr com"><div>' + rot(n.papel || 'Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
          (link ? '<a class="assistir" href="' + bbEsc(link) + '" target="_blank" rel="noopener noreferrer">▶ Assistir a transmissão<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
-       : '<div class="narr sem"><div>' + rot('Narrador') + '<div>Nenhum narrador contratado para este jogo.</div></div>' +
-         (NARRADOR_LOGADO ? '<a class="bt" href="narrador.html#marcar" style="text-decoration:none;background:#00752C">Eu serei o narrador deste jogo</a>'
-                          : '<a href="narrador.html" style="font-weight:600;font-size:14px">É narrador? Entre na área do narrador</a>') + '</div>') +
+       : '<div class="narr sem"><div>' + rot('Narrador ou canal') + '<div>Nenhum narrador ou canal confirmado para este jogo.</div></div>' +
+         '<a class="bt" href="narrador.html?jogo=' + encodeURIComponent(j.id) + '#marcar" style="text-decoration:none;background:#00752C">Serei o narrador ou o canal que vai transmitir</a></div>') +
     rodapeFonte(j);
 }
 function janelaRealizado(j) {
@@ -210,10 +209,10 @@ function janelaRealizado(j) {
   return topo(j, '<span class="selo" style="background:#E7F5EC;color:#00752C">Realizado</span>') +
     '<div class="metades">' + metade(j, j.mand, 'Em casa (mandante)') + metade(j, j.vis, 'Visitante') + '</div>' + res +
     info(j, 'Realizado') +
-    (n ? '<div class="narr com"><div>' + rot('Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
+    (n ? '<div class="narr com"><div>' + rot(n.papel || 'Narrador', '#00752C') + '<div style="font-size:18px;font-weight:700">' + bbEsc(n.nome) + '</div></div>' +
          (nlink ? '<a class="assistir" href="' + bbEsc(nlink) + '" target="_blank" rel="noopener noreferrer">▶ Ver a narração<span class="dica">Abre o link do narrador</span></a>' : '') + '</div>'
-       : '<div class="narr sem"><div>' + rot('Narrador') + '<div>Nenhum narrador registrado neste jogo.</div></div>' +
-         (NARRADOR_LOGADO ? '<a class="bt" href="narrador.html#marcar" style="text-decoration:none;background:#00752C">Eu fui o narrador deste jogo</a>' : '') + '</div>') +
+       : '<div class="narr sem"><div>' + rot('Narrador ou canal') + '<div>Nenhum narrador ou canal registrado neste jogo.</div></div>' +
+         '<a class="bt" href="narrador.html?jogo=' + encodeURIComponent(j.id) + '#marcar" style="text-decoration:none;background:#00752C">Fui o narrador ou o canal que transmitiu</a>' + '</div>') +
     (vd ? '<div class="video tem"><div>' + rot('Vídeo do jogo', '#002776') + '<div>' + bbEsc(vd.titulo || '') + (vd.canal ? ' · ' + bbEsc(vd.canal) : '') + '</div></div>' +
           '<a class="assistir" href="' + bbEsc(vd.link) + '" target="_blank" rel="noopener noreferrer">▶ Ver o vídeo<span class="dica">Abre no YouTube</span></a></div>'
         : (nlink ? '' : formLink('Vídeo do jogo', 'Link não encontrado.'))) + rodapeFonte(j);
