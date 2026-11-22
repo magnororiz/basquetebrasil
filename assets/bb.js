@@ -25,7 +25,7 @@ function bbEscudo(uf, clube) {
 /* Menu e rodapé iguais aos da página inicial */
 function bbMenu(ativo) {
   const itens = [['index.html#inicio', 'Início'], ['index.html#rankings', 'Rankings'], ['index.html#atletas', 'Atletas'], ['index.html#federacoes', 'Federações'],
-    ['calendario.html', 'Calendário'], ['index.html#narradores', 'Narradores'], ['index.html#anuncie', 'Anuncie']];
+    ['calendario.html', 'Calendário'], ['index.html#narradores', 'Narradores'], ['scout.html', 'Scout'], ['index.html#anuncie', 'Anuncie']];
   const nav = itens.map(([h, t]) => t === ativo
     ? '<a href="' + h + '" style="color:#FFDF00;text-decoration:none;border-bottom:2px solid #FFDF00;padding:6px 0">' + t + '</a>'
     : '<a href="' + h + '" style="color:#FFFFFF;text-decoration:none;padding:6px 0">' + t + '</a>').join('');
