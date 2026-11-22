@@ -95,6 +95,12 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#4A5675;bo
 <div id="mPedidos" class="msg" role="alert"></div>
 </div>
 <div class="card">
+<h2 class="h">Vídeos enviados pelo público</h2>
+<p style="margin:0 0 12px;color:#4A5675">O sistema aprova sozinho quando o título do vídeo traz os dois times e a categoria ou a data. Os outros ficam aqui esperando sua análise.</p>
+<div id="videos" class="tabela"></div>
+<div id="mVideos" class="msg" role="alert"></div>
+</div>
+<div class="card">
 <h2 class="h">Narradores</h2>
 <div id="usuarios" class="tabela"></div>
 </div>
@@ -126,7 +132,7 @@ function entrar(u) {
   if (u.trocarSenha) return ver('vTroca');
   ver('vPainel'); $('pNome').textContent = u.nome + (u.ehDono ? ' · administrador' : '');
   $('vDono').classList.toggle('oculto', !u.ehDono);
-  carregarJogos(); carregarMeus(); if (u.ehDono) { carregarPedidos(); carregarUsuarios(); }
+  carregarJogos(); carregarMeus(); if (u.ehDono) { carregarPedidos(); carregarUsuarios(); carregarVideos(); }
 }
 $('fLogin').addEventListener('submit', async e => {
   e.preventDefault(); const r = await bbApi({ acao: 'login', usuario: $('lUsuario').value, senha: $('lSenha').value });
@@ -201,6 +207,17 @@ async function carregarUsuarios() {
     (u.perfil === 'Dono' ? '' : '<button class="btn ' + (u.ativo ? 'vermelho' : 'verde') + '" data-u="' + bbEsc(u.usuario) + '" data-v="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Ativar') + '</button>') + '</td></tr>').join('') + '</tbody></table>';
   el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
     const r2 = await api({ acao: 'ativarUsuario', usuario: b.dataset.u, ativo: b.dataset.v === '1' }); msg('mPedidos', r2); carregarUsuarios();
+  }));
+}
+async function carregarVideos() {
+  const r = await api({ acao: 'listarVideos' }); const el = $('videos'); if (!r.ok) { el.innerHTML = bbEsc(r.erro); return; }
+  const vs = r.videos.slice().reverse();
+  if (!vs.length) { el.innerHTML = '<p style="color:#4A5675">Nenhum vídeo enviado ainda.</p>'; return; }
+  el.innerHTML = '<table><thead><tr><th>Enviado</th><th>Jogo</th><th>Vídeo</th><th>Conferência</th><th>Situação</th><th></th></tr></thead><tbody>' + vs.map(v =>
+    '<tr><td>' + bbEsc(v.data) + '</td><td>' + bbEsc(v.jogo) + '</td><td><a href="' + bbEsc(v.link) + '" target="_blank" rel="noopener">' + bbEsc(v.titulo || 'abrir') + '</a><br><small>' + bbEsc(v.canal) + '</small></td><td><small>' + bbEsc(v.verif) + '</small></td><td>' + bbEsc(v.situacao) + '</td><td>' +
+    (v.situacao === 'Pendente' ? '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn verde" data-l="' + v.linha + '" data-a="1">Aprovar</button><button class="btn vermelho" data-l="' + v.linha + '" data-a="0">Recusar</button></div>' : '') + '</td></tr>').join('') + '</tbody></table>';
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+    const r2 = await api({ acao: 'decidirVideo', linha: Number(b.dataset.l), aprovar: b.dataset.a === '1' }); msg('mVideos', r2); carregarVideos();
   }));
 }
 iniciar();

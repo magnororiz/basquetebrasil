@@ -28,6 +28,7 @@ function doPost(e) {
   let p = {};
   try { p = JSON.parse(e.postData.contents || '{}'); } catch (err) { return responder({ ok: false, erro: 'Pedido inválido.' }); }
   if (p.acao === 'calendario') return responder(calendario());
+  if (p.acao === 'sugerirLink') { const l = LockService.getScriptLock(); l.waitLock(20000); try { return responder(sugerirLink(p.id, p.link)); } finally { l.releaseLock(); } }
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     switch (p.acao) {
@@ -44,6 +45,8 @@ function doPost(e) {
       case 'recusarPedido': return responder(recusarPedido(p.token, p.linha, p.motivo));
       case 'listarUsuarios': return responder(listarUsuarios(p.token));
       case 'ativarUsuario': return responder(ativarUsuario(p.token, p.usuario, p.ativo));
+      case 'listarVideos': return responder(listarVideos(p.token));
+      case 'decidirVideo': return responder(decidirVideo(p.token, p.linha, p.aprovar));
       default: return responder({ ok: false, erro: 'Ação desconhecida.' });
     }
   } catch (err) {
@@ -98,7 +101,10 @@ function calendario() {
   const narr = {};
   const sh = abaN('Contratacoes');
   if (sh && sh.getLastRow() > 1) sh.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[7]) narr[r[0]] = { nome: r[7], link: r[8] }; });
-  const res = { ok: true, gerado: agora(), fontes: fontes, jogos: jogos, posicoes: posicoes, narradores: narr };
+  const videos = {};
+  const sv = abaN('Videos');
+  if (sv && sv.getLastRow() > 1) sv.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[2] && r[6] === 'Aprovado' && !videos[r[0]]) videos[r[0]] = { link: r[2], titulo: r[3], canal: r[4] }; });
+  const res = { ok: true, gerado: agora(), fontes: fontes, jogos: jogos, posicoes: posicoes, narradores: narr, videos: videos };
   try { c.put('cal1', JSON.stringify(res), 300); } catch (e) {}
   return res;
 }
@@ -254,3 +260,61 @@ function ativarUsuario(token, usuario, ativo) {
   abaN('Usuarios').getRange(u.linha, 7).setValue(ativo ? 'SIM' : 'NÃO');
   return { ok: true, msg: 'Usuário ' + u.usuario + (ativo ? ' ativado.' : ' desativado.') };
 }
+
+/* ================= VÍDEOS DOS JOGOS (link enviado pelo público, conferido antes de aparecer) ================= */
+const GENERICOS = { CLUBE: 1, CLUB: 1, BASQUETE: 1, BASKET: 1, BASKETBALL: 1, ESPORTE: 1, ESPORTES: 1, FUTEBOL: 1, REGATAS: 1, ATLETICO: 1, FOOTBALL: 1, ASSOCIACAO: 1, ESCOLINHA: 1, TENIS: 1, DE: 1, DA: 1, DO: 1, DOS: 1, DAS: 1, E: 1, A: 1, C: 1, R: 1, F: 1, S: 1, T: 1, B: 1, AC: 1, FC: 1, EC: 1, SUB: 1 };
+function tokensTime(nome) { return chave(nome).split(' ').filter(t => t.length >= 3 && !GENERICOS[t]); }
+function idYoutube(link) {
+  const m = String(link || '').match(/^https:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+function infoYoutube(vid) {
+  try {
+    const r = UrlFetchApp.fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + vid), { muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200) return null;
+    const j = JSON.parse(r.getContentText()); return { titulo: String(j.title || ''), canal: String(j.author_name || '') };
+  } catch (e) { return null; }
+}
+/* Confere se o título do vídeo bate com o jogo: os dois times e (categoria ou data). Só aprova sozinho quando tudo bate. */
+function conferirVideo(j, info) {
+  const t = ' ' + chave(info.titulo) + ' ';
+  const timeOk = nome => tokensTime(nome).some(k => t.indexOf(' ' + k + ' ') >= 0);
+  const num = (String(j.cat).match(/\d{2}/) || [])[0];
+  const catOk = !!num && new RegExp('(SUB|U) ?' + num + '( |$)').test(t.trim() + ' ');
+  const d = String(j.data).split('/'); const dataOk = d.length === 3 && new RegExp('(^| )' + Number(d[0]) + ' 0?' + Number(d[1]) + '( |$)|(^| )' + d[0] + ' ' + d[1] + '( |$)').test(t.trim());
+  const a = timeOk(j.mand), b = timeOk(j.vis);
+  const nota = [a ? 'mandante ✓' : 'mandante ✗', b ? 'visitante ✓' : 'visitante ✗', catOk ? 'categoria ✓' : 'categoria ✗', dataOk ? 'data ✓' : 'data ✗'].join(', ');
+  return { aprovado: a && b && (catOk || dataOk), nota: nota };
+}
+function sugerirLink(id, link) {
+  const c = CacheService.getScriptCache(); const n = Number(c.get('sug_min') || 0);
+  if (n > 30) return { ok: false, erro: 'Muitos envios agora. Tente de novo em alguns minutos.' }; c.put('sug_min', String(n + 1), 60);
+  link = norm(link); const vid = idYoutube(link);
+  if (!vid) return { ok: false, erro: 'Mande um link do YouTube (youtube.com ou youtu.be).' };
+  const j = jogoPorId(id); if (!j) return { ok: false, erro: 'Jogo não encontrado no calendário.' };
+  const sh = abaN('Videos'); const v = sh.getLastRow() > 1 ? sh.getDataRange().getDisplayValues().slice(1) : [];
+  if (v.some(r => r[0] === id && idYoutube(r[2]) === vid)) return { ok: false, erro: 'Esse link já foi enviado para este jogo. Obrigado!' };
+  if (v.some(r => r[0] === id && r[6] === 'Aprovado')) return { ok: false, erro: 'Este jogo já tem vídeo. Obrigado!' };
+  const info = infoYoutube(vid);
+  if (!info) return { ok: false, erro: 'Não consegui abrir esse vídeo no YouTube. Confira se ele é público.' };
+  const conf = conferirVideo(j, info);
+  const limpo = 'https://www.youtube.com/watch?v=' + vid;
+  sh.appendRow([id, j.data + ' · ' + j.cat + ' · ' + j.mand + ' x ' + j.vis, limpo, info.titulo, info.canal, 'público', conf.aprovado ? 'Aprovado' : 'Pendente', 'Automática: ' + conf.nota, agora()]);
+  if (conf.aprovado) { limparCacheCalendario(); return { ok: true, aprovado: true, msg: 'Obrigado! O vídeo confere com o jogo e já aparece no calendário.' }; }
+  return { ok: true, aprovado: false, msg: 'Obrigado! O título do vídeo não confirma tudo sozinho, então ele vai para análise antes de aparecer.' };
+}
+function listarVideos(token) {
+  const d = exigeDono(token); if (d.erro) return d.erro; const sh = abaN('Videos');
+  const v = sh.getLastRow() > 1 ? sh.getDataRange().getDisplayValues().slice(1) : [];
+  return { ok: true, videos: v.map((r, i) => ({ linha: i + 2, jogo: r[1], link: r[2], titulo: r[3], canal: r[4], origem: r[5], situacao: r[6], verif: r[7], data: r[8] })).filter(x => x.link) };
+}
+function decidirVideo(token, linha, aprovar) {
+  const d = exigeDono(token); if (d.erro) return d.erro; const sh = abaN('Videos');
+  if (sh.getRange(Number(linha), 7).getDisplayValue() !== 'Pendente') return { ok: false, erro: 'Este vídeo não está pendente.' };
+  sh.getRange(Number(linha), 7).setValue(aprovar ? 'Aprovado' : 'Recusado');
+  sh.getRange(Number(linha), 8).setValue(sh.getRange(Number(linha), 8).getDisplayValue() + ' · ' + (aprovar ? 'aprovado' : 'recusado') + ' por ' + d.u.usuario + ' em ' + agora());
+  limparCacheCalendario();
+  return { ok: true, msg: aprovar ? 'Vídeo aprovado: já aparece no calendário.' : 'Vídeo recusado.' };
+}
+/* Rode uma vez pelo editor depois de colar esta versão: autoriza o acesso ao YouTube (UrlFetch). */
+function autorizarYoutube() { Logger.log(JSON.stringify(infoYoutube('dQw4w9WgXcQ'))); }
