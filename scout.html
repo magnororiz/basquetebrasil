@@ -28,6 +28,13 @@ a{color:#00752C}a:hover{color:#005A22}
 .zoom{position:relative;border-radius:14px;overflow:hidden;background:#0B1B3F;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:#C9D3EA;text-align:center;padding:20px;border:3px solid #FFDF00}
 .zoom.foto{padding:0;background:#fff}
 .zoom.foto img{width:100%;height:100%;object-fit:contain;display:block}
+.zoom.foto.escuro{background:#0b0b0b}
+.zoom.foto{cursor:zoom-in}
+.zoom.foto::after{content:"🔍 toque para ampliar";position:absolute;right:10px;bottom:10px;background:rgba(0,39,118,.85);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+#lb{position:fixed;inset:0;z-index:9999;background:rgba(0,10,30,.92);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6);background:#fff}
+#lb button{position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:0;background:#FFDF00;color:#002776;font-size:24px;font-weight:800;cursor:pointer}
 .zoom small{display:block;margin-top:8px;font-size:13px;color:#8A94AD}
 .zoom .tag{position:absolute;top:12px;left:12px;background:#FFDF00;color:#002776;font-size:12px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:999px}
 .passos{counter-reset:p;display:grid;gap:14px;margin:0;padding:0;list-style:none}
@@ -61,7 +68,7 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn amarelo" href="#planos">Quero o scout</a><a class="btn contorno" href="#desconto">Como ganhar desconto</a></div>
 </div>
 <div style="flex:1 1 360px">
-<div class="zoom foto"><span class="tag">ZOOM</span><img src="assets/scout/scout-zoom.jpg" alt="Painel de um time com os jogadores e as estatísticas de cada atleta" loading="lazy"></div>
+<div class="zoom foto"><span class="tag">ZOOM</span><img src="assets/scout/scout-zoom2.jpg" alt="Painel de um time com os jogadores e as estatísticas de cada atleta" loading="lazy"></div>
 </div>
 </div>
 </section>
@@ -89,9 +96,9 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <h2 class="h">Um gostinho do scout</h2>
 <p class="lead">Alguns recortes da tela. O resto você conhece por dentro quando entrar.</p>
 <div class="grade">
-<div class="zoom foto"><span class="tag">TIME</span><img src="assets/scout/scout-time.jpg" alt="Lista de um time com os números de cada atleta" loading="lazy"></div>
-<div class="zoom"><span class="tag">BOTÕES</span><div>[print: alguns botões de lance (2P, 3P, rebote…)]</div></div>
-<div class="zoom foto"><span class="tag">AO VIVO</span><img src="assets/scout/scout-aovivo.jpg" alt="Placar do jogo como o público vê" loading="lazy"></div>
+<div class="zoom foto"><span class="tag">TIME</span><img src="assets/scout/scout-time2.jpg" alt="Lista de um time com os números de cada atleta" loading="lazy"></div>
+<div class="zoom foto escuro"><span class="tag">BOTÕES</span><img src="assets/scout/scout-botoes.jpg" alt="Painel de marcação do scout com os botões de lance" loading="lazy"></div>
+<div class="zoom foto escuro"><span class="tag">AO VIVO</span><img src="assets/scout/scout-aovivo2.jpg" alt="Placar do jogo como o público vê" loading="lazy"></div>
 </div>
 </div>
 </section>
@@ -150,5 +157,12 @@ details p{color:#4A5675;line-height:1.6;margin:10px 0 0}
 <div id="bb-rodape"></div>
 <script src="assets/bb.js"></script>
 <script>bbMontar('Scout');</script>
+<div id="lb" role="dialog" aria-label="Imagem ampliada"><button type="button" aria-label="Fechar">×</button><img alt=""></div>
+<script>
+(function(){var lb=document.getElementById('lb'),im=lb.querySelector('img');
+document.querySelectorAll('.zoom.foto').forEach(function(z){z.addEventListener('click',function(){var i=z.querySelector('img');im.src=i.src;im.alt=i.alt;lb.classList.add('on');});});
+lb.addEventListener('click',function(){lb.classList.remove('on');});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on');});})();
+</script>
 </body>
 </html>
