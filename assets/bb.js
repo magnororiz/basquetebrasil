@@ -1,6 +1,6 @@
 /* Basquete Brasil — funções comuns das páginas (menu, rodapé, conexão com o backend, escudos) */
 /* Cole aqui a URL do App da Web do Apps Script (conta basquetebrasil.base), terminada em /exec */
-const BB_API = 'COLE_AQUI_A_URL_DO_APPS_SCRIPT';
+const BB_API = 'https://script.google.com/macros/s/AKfycbxVoOR5y7-uzTFf1A_sK_eMuFPX7KGlUW9GEl7h6cFLFJvUWbom54kJRKDT407KHj3Akw/exec';
 
 function bbApiPronta() { return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(BB_API); }
 async function bbApi(dados) {
