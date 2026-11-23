@@ -150,6 +150,34 @@ select{font:inherit}
 </aside>
 </section>
 
+<!-- CALENDÁRIO -->
+<style>
+.hj-grupo{display:flex;flex-direction:column;gap:12px}
+.hj-tit{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hj-tit h3{margin:0;font-size:24px;font-weight:800}
+.hj-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.hj-card{background:#FFFFFF;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;border:1px solid #E3E7EF;color:#0B1B3F;text-decoration:none}
+.hj-card:hover{border-color:#002776;box-shadow:0 4px 14px rgba(0,39,118,.12)}
+.hj-topo{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hj-selo{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.hj-selo.hoje{color:#A01616;background:#FDECEC}.hj-selo.breve{color:#0A3A8C;background:#E8EEFA}.hj-selo.fim{color:#4A5675;background:#EEF1F6}
+.hj-card{cursor:pointer}.hj-fed{display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;padding:5px 12px 5px 18px;border-radius:10px;color:#FFFFFF;text-decoration:none;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap}.hj-fed b{font-size:13px;font-weight:800;letter-spacing:.02em}.hj-fed small{font-size:12px;font-weight:600}.hj-fed:hover{filter:brightness(1.12)}.hj-topo{align-items:flex-start;flex-wrap:wrap}
+.hj-time{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:16px}
+.hj-time span{display:flex;align-items:center;gap:8px;min-width:0}
+.hj-time img{width:24px;height:24px;object-fit:contain;flex:none}
+.hj-time strong{font-family:'Barlow Condensed',sans-serif;font-size:26px}
+.hj-time .venc{font-weight:700}.hj-time .perd{color:#4A5675}
+.hj-pe{font-size:13px;color:#4A5675}
+.hj-vazio{margin:0;padding:16px;border-radius:12px;background:#FFFFFF;border:1px dashed #C9D3EA;color:#4A5675;font-size:15px}
+</style>
+<section id="calendario" style="max-width:1200px;width:100%;box-sizing:border-box;margin:0 auto;padding:72px 24px 0;display:flex;flex-direction:column;gap:24px">
+<div class="hj-tit"><h2 class="h" style="margin:0;font-size:40px;font-weight:800">Jogos de hoje e próximos</h2><a href="calendario.html" style="font-weight:700;color:#002776">Ver o calendário completo →</a></div>
+<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Hoje</h3><span id="hj-data" class="hj-pe"></span></div><div id="hj-hoje" class="hj-grade"><p class="hj-vazio">Carregando os jogos…</p></div></div>
+<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Em breve</h3><span class="hj-pe">Os próximos 3 jogos</span></div><div id="hj-breve" class="hj-grade"></div></div>
+<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Jogos finalizados</h3><span class="hj-pe">Os últimos 3 com placar</span></div><div id="hj-fim" class="hj-grade"></div></div>
+<p id="hj-fonte" class="hj-pe" style="margin:0"></p>
+</section>
+
 <!-- NARRADORES -->
 <section id="narradores" style="max-width:1200px;width:100%;box-sizing:border-box;margin:0 auto;padding:72px 24px 0;display:flex;flex-direction:column;gap:20px">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px">
@@ -204,34 +232,6 @@ select{font:inherit}
 <span style="font-size:15px;color:#4A5675;line-height:1.6">Mensal, por jogo ou um jogo de experiência: a gente combina o formato com você.</span>
 <a href="https://wa.me/5521998092305?text=Ol%C3%A1%2C%20Klaus%21%20Vi%20o%20scout%20no%20basquetebrasil.com%20e%20quero%20um%20or%C3%A7amento." target="_blank" rel="noopener" style="align-self:flex-start;margin-top:6px;background:#00752C;color:#FFFFFF;font-weight:700;text-decoration:none;padding:12px 18px;border-radius:10px">Pedir orçamento no WhatsApp</a>
 </div>
-</section>
-
-<!-- CALENDÁRIO -->
-<style>
-.hj-grupo{display:flex;flex-direction:column;gap:12px}
-.hj-tit{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.hj-tit h3{margin:0;font-size:24px;font-weight:800}
-.hj-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.hj-card{background:#FFFFFF;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;border:1px solid #E3E7EF;color:#0B1B3F;text-decoration:none}
-.hj-card:hover{border-color:#002776;box-shadow:0 4px 14px rgba(0,39,118,.12)}
-.hj-topo{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.hj-selo{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
-.hj-selo.hoje{color:#A01616;background:#FDECEC}.hj-selo.breve{color:#0A3A8C;background:#E8EEFA}.hj-selo.fim{color:#4A5675;background:#EEF1F6}
-.hj-card{cursor:pointer}.hj-fed{display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;padding:5px 12px 5px 18px;border-radius:10px;color:#FFFFFF;text-decoration:none;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap}.hj-fed b{font-size:13px;font-weight:800;letter-spacing:.02em}.hj-fed small{font-size:12px;font-weight:600}.hj-fed:hover{filter:brightness(1.12)}.hj-topo{align-items:flex-start;flex-wrap:wrap}
-.hj-time{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:16px}
-.hj-time span{display:flex;align-items:center;gap:8px;min-width:0}
-.hj-time img{width:24px;height:24px;object-fit:contain;flex:none}
-.hj-time strong{font-family:'Barlow Condensed',sans-serif;font-size:26px}
-.hj-time .venc{font-weight:700}.hj-time .perd{color:#4A5675}
-.hj-pe{font-size:13px;color:#4A5675}
-.hj-vazio{margin:0;padding:16px;border-radius:12px;background:#FFFFFF;border:1px dashed #C9D3EA;color:#4A5675;font-size:15px}
-</style>
-<section id="calendario" style="max-width:1200px;width:100%;box-sizing:border-box;margin:0 auto;padding:72px 24px 0;display:flex;flex-direction:column;gap:24px">
-<div class="hj-tit"><h2 class="h" style="margin:0;font-size:40px;font-weight:800">Jogos de hoje e próximos</h2><a href="calendario.html" style="font-weight:700;color:#002776">Ver o calendário completo →</a></div>
-<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Hoje</h3><span id="hj-data" class="hj-pe"></span></div><div id="hj-hoje" class="hj-grade"><p class="hj-vazio">Carregando os jogos…</p></div></div>
-<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Em breve</h3><span class="hj-pe">Os próximos 3 jogos</span></div><div id="hj-breve" class="hj-grade"></div></div>
-<div class="hj-grupo"><div class="hj-tit"><h3 class="h">Jogos finalizados</h3><span class="hj-pe">Os últimos 3 com placar</span></div><div id="hj-fim" class="hj-grade"></div></div>
-<p id="hj-fonte" class="hj-pe" style="margin:0"></p>
 </section>
 
 <!-- FEDERAÇÕES -->
