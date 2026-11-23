@@ -4,7 +4,7 @@
  * troca obrigatória no primeiro acesso, sessão de 12 h).
  *
  * Planilhas lidas (só os nossos backups; o site nunca lê a federação direto):
- *   Backup RJ – FBERJ, Backup RS – FGB, Backup CBB – Federações estaduais  -> abas Jogos e Classificacao
+ *   Backup RJ – FBERJ, Backup RS – FGB, Backup CBB – Federações estaduais, Backup CBB – CBI  -> abas Jogos e Classificacao
  * Planilha privada (nunca vai para o site): Basquete Brasil – Narradores (privado)
  *   Usuarios: A Login | B Nome de exibição | C Nome completo | D CPF | E E-mail | F Perfil | G Ativo | H Senha protegida | I Trocar senha | J Último acesso | K Criado em
  *   Pedidos:  A Data | B Nome completo | C Login desejado | D CPF | E E-mail | F Canal | G Aceitou termos | H Situação | I Observação
@@ -18,7 +18,8 @@ const NARRADORES_ID = '1owmWHQqNgBn3Ez9LIpIETG1pzTafyg5Q8v5Kpp0bIOA';
 const BACKUPS = [
   { uf: 'RJ', id: '1JF5dUiKoZjrZXAHTkCY4FJpxYUN0u-ZfV5VIshG0mqg' },
   { uf: 'RS', id: '1K5Yf5Xs9nPIn55FsuBAnxBPiGKFwoup1kVte1ET4IOU' },
-  { uf: 'CBB', id: '1i-9yuC5xmodzc5p3YobSOmeE4-_AQqA2zdvbyj5nrhg' }
+  { uf: 'CBB', id: '1i-9yuC5xmodzc5p3YobSOmeE4-_AQqA2zdvbyj5nrhg' },
+  { uf: 'CBI', id: '1-qdGj6lJhiOAYEFeYGby_EtaQvsU0gXnb_tPZwdlrVY' } // Backup CBB – CBI (nacional de clubes; as linhas usam UF "BR")
 ];
 const HORAS_SESSAO = 12;
 

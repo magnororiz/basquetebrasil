@@ -28,6 +28,7 @@ img{max-width:100%}
 .placar{font-family:"Barlow Condensed",Inter,sans-serif;font-size:20px;font-weight:700;color:#002776}
 .sub{font-size:13px;color:#4A5675;margin-top:4px}
 .selo{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;white-space:nowrap}
+.cat.cbi{background:#FFDF00;color:#002776}
 .selo.n{background:#E7F5EC;color:#00752C}.selo.v{background:#F4F6FA;color:#8A94AD}
 .escudo{width:28px;height:28px;object-fit:contain;flex:none}
 .semlogo{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#EEF1F6;color:#8A94AD;font-size:9px;font-weight:700;flex:none}
@@ -102,6 +103,9 @@ const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
 const hojeNum = (() => { const h = new Date(); return h.getFullYear() * 10000 + (h.getMonth() + 1) * 100 + h.getDate(); })();
 const DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
 function nomeDia(d) { const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); const dt = new Date(+m[3], +m[2] - 1, +m[1]); return DIAS[dt.getDay()] + ', ' + d; }
+/* CBI (nacional de clubes): UF "BR", selo e filtro próprios, nunca somado ao estadual */
+const ehCBI = j => j.uf === 'BR';
+const rotuloFed = (u, fed) => u === 'BR' ? 'Nacional – CBI' : (fed ? fed + ' (' + u + ')' : u);
 function realizado(j) { return /realizado|encerrado|finalizado/i.test(j.sit) || (j.pm !== '' && j.pv !== '') || dataNum(j.data) < hojeNum; }
 function logo(j, clube, grande) {
   const src = bbEscudo(j.uf, clube);
@@ -129,7 +133,7 @@ function encher(sel, valores, rotulo, todos) {
 }
 function opcoes(nivel) {
   const per = fPer.value; let js = DADOS.jogos.filter(j => (per === 'real') === realizado(j));
-  if (nivel === 'per') { const feds = {}; js.forEach(j => feds[j.uf] = j.fed); encher(fUf, Object.keys(feds).sort(), u => (feds[u] ? feds[u] + ' (' + u + ')' : u), 'Todas'); }
+  if (nivel === 'per') { const feds = {}; js.forEach(j => feds[j.uf] = j.fed); encher(fUf, Object.keys(feds).sort((a, b) => (a === 'BR') - (b === 'BR') || a.localeCompare(b)), u => rotuloFed(u, feds[u]), 'Todas'); }
   if (fUf.value) js = js.filter(j => j.uf === fUf.value);
   if (nivel === 'per' || nivel === 'uf') encher(fCat, [...new Set(js.map(j => j.cat))].sort((a, b) => a.localeCompare(b, 'pt', { numeric: true })), null, 'Todas');
   if (fCat.value) js = js.filter(j => j.cat === fCat.value);
@@ -150,7 +154,7 @@ function desenhar() {
     const cm = w === 'm' ? 'venc' : (w === 'v' ? 'perd' : ''), cv = w === 'v' ? 'venc' : (w === 'm' ? 'perd' : '');
     const selo = n ? '<span class="selo n">🎙 ' + bbEsc(n.nome) + '</span>' : (vd ? '<span class="selo n">▶ Vídeo</span>' : '<span class="selo v">' + (per === 'real' ? 'Sem vídeo' : 'Sem narrador') + '</span>');
     html += '<button class="jogo" type="button" data-id="' + bbEsc(j.id) + '">' +
-      '<div><div class="hora">' + bbEsc(j.hora || '—') + '</div><span class="cat">' + bbEsc(j.uf + ' · ' + j.cat) + '</span></div>' +
+      '<div><div class="hora">' + bbEsc(j.hora || '—') + '</div>' + (ehCBI(j) ? '<span class="cat cbi">Nacional – CBI · ' + bbEsc(j.cat) + '</span>' : '<span class="cat">' + bbEsc(j.uf + ' · ' + j.cat) + '</span>') + '</div>' +
       '<div><div class="times">' + logo(j, j.mand) + '<span class="' + cm + '">' + bbEsc(j.mand) + '</span>' + (pl ? '<span class="placar">' + bbEsc(j.pm) + '</span>' : '') +
       '<span class="x">x</span>' + (pl ? '<span class="placar">' + bbEsc(j.pv) + '</span>' : '') + '<span class="' + cv + '">' + bbEsc(j.vis) + '</span>' + logo(j, j.vis) + '</div>' +
       '<div class="sub">' + bbEsc([j.camp, j.local].filter(Boolean).join(' · ')) + '</div></div>' + selo + '</button>';
@@ -170,7 +174,7 @@ let ultimoFoco = null;
 const rot = (t, cor) => '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:' + (cor || '#4A5675') + '">' + t + '</div>';
 function topo(j, selo) {
   return '<div class="jtopo"><div><div id="jTitulo" class="h" style="font-size:24px;font-weight:700">' + bbEsc(j.cat) + ' · ' + bbEsc(j.camp) + '</div>' +
-    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
+    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([ehCBI(j) ? 'Nacional – CBI (CBB)' : j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
     '<div style="display:flex;gap:10px;align-items:center">' + selo + '<button class="fechar" type="button" aria-label="Fechar">×</button></div></div>';
 }
 function info(j, sit) {
