@@ -21,7 +21,7 @@ function bbChave(x) { return String(x || '').normalize('NFD').replace(/[\u0300-\
 /* Nome do time sem a categoria no fim (a CBB escreve "Cerrado Basquete -15"; a categoria já aparece no jogo) */
 function bbNomeLimpo(nome) { return String(nome || '').replace(/\s*-\s*(1[0-9]|2[0-3])\s*$/, '').trim(); }
 /* Nomes diferentes do MESMO time, confirmados pelo Magno: { UF: { 'CHAVE DO NOME': 'Nome que aparece' } } */
-const BB_UNIR = {"RJ":{"FLUMINESE F C":"FLUMINENSE F.C.","FLUMINENSE F C":"FLUMINENSE F.C.","ABIG IGUABA GRANDE":"ABIG - IGUABA GRANDE","ABIG JIC SHARK S":"ABIG - JIC - SHARK'S","TIJUCA BASKET":"TIJUCA TC - RAIZEIRAS","TIJUCA T C RAIZEIRAS":"TIJUCA TC - RAIZEIRAS"},"DF":{"FILADELFIA BASQUETE 2":"Filadélfia Basquete"},"SP":{"MOG":"MOGI BASQUETE","COR":"S.C. CORINTHIANS PAULISTA","PIN":"E.C. PINHEIROS","BAU":"BAURU BASKET","CAP":"CLUB ATHLETICO PAULISTANO","SJC":"SÃO JOSÉ DOS CAMPOS BASKETBALL"}}; /* confirmado em 23/11/2026 */
+const BB_UNIR = {"RJ":{"FLUMINESE F C":"FLUMINENSE F.C.","FLUMINENSE F C":"FLUMINENSE F.C.","ABIG IGUABA GRANDE":"ABIG - IGUABA GRANDE","ABIG JIC SHARK S":"ABIG - JIC - SHARK'S","TIJUCA BASKET":"TIJUCA TC - RAIZEIRAS","TIJUCA T C RAIZEIRAS":"TIJUCA TC - RAIZEIRAS"},"DF":{"FILADELFIA BASQUETE 2":"Filadélfia Basquete"},"SP":{"MOG":"MOGI BASQUETE","COR":"S.C. CORINTHIANS PAULISTA","PIN":"E.C. PINHEIROS","BAU":"BAURU BASKET","CAP":"CLUB ATHLETICO PAULISTANO","SJC":"SÃO JOSÉ DOS CAMPOS BASKETBALL","FRA":"SESI FRANCA BASQUETE"}}; /* confirmado em 23/11/2026 */
 /* Junta as variações de nome: tira a categoria, aplica BB_UNIR e, quando só muda ponto, espaço ou acento,
    usa a grafia mais frequente. Guarda o nome original da fonte em mandF / visF. */
 function bbUnificar(jogos) {

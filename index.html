@@ -325,7 +325,7 @@ select{font:inherit}
 </footer>
 
 </div>
-<script src="assets/bb.js?v=a005"></script>
+<script src="assets/bb.js?v=a006"></script>
 <script>
 (function () {
   const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
@@ -363,7 +363,7 @@ select{font:inherit}
   document.getElementById('hj-data').textContent = h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
   bbApi({ acao: 'calendario' }).then(r => {
     if (!r || !r.ok) { document.getElementById('hj-hoje').innerHTML = '<p class="hj-vazio">' + bbEsc((r && r.erro) || 'Não foi possível carregar os jogos.') + '</p>'; return; }
-    const js = r.jogos || [], narr = r.narradores || {};
+    const js = bbUnificar(r.jogos || []), narr = r.narradores || {};
     const doDia = js.filter(j => dataNum(j.data) === hoje && !temPlacar(j)).sort(ordem);
     const breve = js.filter(j => dataNum(j.data) > hoje && !fim(j)).sort(ordem).slice(0, 3);
     const ult = js.filter(j => temPlacar(j) && dataNum(j.data) <= hoje).sort(ordem).reverse().slice(0, 3);
