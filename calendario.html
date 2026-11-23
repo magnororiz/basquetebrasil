@@ -105,7 +105,8 @@ const DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quint
 function nomeDia(d) { const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); const dt = new Date(+m[3], +m[2] - 1, +m[1]); return DIAS[dt.getDay()] + ', ' + d; }
 /* CBI (nacional de clubes): UF "BR", selo e filtro próprios, nunca somado ao estadual */
 const ehCBI = j => j.uf === 'BR';
-const rotuloFed = (u, fed) => u === 'BR' ? 'Nacional – CBI' : (fed ? fed + ' (' + u + ')' : u);
+const rotuloFed = (u, fed) => u === 'BR' ? 'Nacional – CBI' : (fed ? String(fed).replace(/\s*\(dados da CBB\)/i, '').trim() + ' (' + u + ')' : u);
+const ordemFed = (a, b) => (b === 'BR') - (a === 'BR') || a.localeCompare(b); /* CBI primeiro, depois os estados em ordem alfabética */
 function realizado(j) { return /realizado|encerrado|finalizado/i.test(j.sit) || (j.pm !== '' && j.pv !== '') || dataNum(j.data) < hojeNum; }
 function logo(j, clube, grande) {
   const src = bbEscudo(j.uf, clube);
@@ -117,7 +118,9 @@ async function iniciar() {
   const r = await bbApi({ acao: 'calendario' });
   if (!r.ok) { document.getElementById('lista').innerHTML = '<p class="aviso">' + bbEsc(r.erro || 'Não foi possível carregar o calendário.') + '</p>'; return; }
   DADOS = r; DADOS.videos = r.videos || {};
-  document.getElementById('fontes').textContent = r.fontes.length ? 'Fontes no calendário: ' + r.fontes.join(', ') + ' · atualizado em ' + r.gerado : '';
+  const fedsCal = {}; r.jogos.forEach(j => { if (!fedsCal[j.uf]) fedsCal[j.uf] = j.fed; });
+  const ufsCal = Object.keys(fedsCal).sort(ordemFed);
+  document.getElementById('fontes').textContent = ufsCal.length ? 'No calendário: ' + ufsCal.map(u => rotuloFed(u, fedsCal[u])).join(', ') + ' · atualizado em ' + r.gerado : '';
   if (!r.jogos.some(j => !realizado(j))) fPer.value = 'real';
   fPer.addEventListener('change', () => { opcoes('per'); desenhar(); });
   fUf.addEventListener('change', () => { opcoes('uf'); desenhar(); });
@@ -133,7 +136,7 @@ function encher(sel, valores, rotulo, todos) {
 }
 function opcoes(nivel) {
   const per = fPer.value; let js = DADOS.jogos.filter(j => (per === 'real') === realizado(j));
-  if (nivel === 'per') { const feds = {}; js.forEach(j => feds[j.uf] = j.fed); encher(fUf, Object.keys(feds).sort((a, b) => (a === 'BR') - (b === 'BR') || a.localeCompare(b)), u => rotuloFed(u, feds[u]), 'Todas'); }
+  if (nivel === 'per') { const feds = {}; js.forEach(j => feds[j.uf] = j.fed); encher(fUf, Object.keys(feds).sort(ordemFed), u => rotuloFed(u, feds[u]), 'Todas'); }
   if (fUf.value) js = js.filter(j => j.uf === fUf.value);
   if (nivel === 'per' || nivel === 'uf') encher(fCat, [...new Set(js.map(j => j.cat))].sort((a, b) => a.localeCompare(b, 'pt', { numeric: true })), null, 'Todas');
   if (fCat.value) js = js.filter(j => j.cat === fCat.value);
@@ -174,7 +177,7 @@ let ultimoFoco = null;
 const rot = (t, cor) => '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:' + (cor || '#4A5675') + '">' + t + '</div>';
 function topo(j, selo) {
   return '<div class="jtopo"><div><div id="jTitulo" class="h" style="font-size:24px;font-weight:700">' + bbEsc(j.cat) + ' · ' + bbEsc(j.camp) + '</div>' +
-    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([ehCBI(j) ? 'Nacional – CBI (CBB)' : j.fed + ' (' + j.uf + ')', j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
+    '<div style="font-size:13px;color:#C9D3EA">' + bbEsc([rotuloFed(j.uf, j.fed), j.fase, j.num ? 'Jogo nº ' + j.num : ''].filter(Boolean).join(' · ')) + '</div></div>' +
     '<div style="display:flex;gap:10px;align-items:center">' + selo + '<button class="fechar" type="button" aria-label="Fechar">×</button></div></div>';
 }
 function info(j, sit) {
