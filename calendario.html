@@ -94,7 +94,7 @@ img{max-width:100%}
 </div>
 
 <div id="bb-rodape"></div>
-<script src="assets/bb.js?v=a007"></script>
+<script src="assets/bb.js?v=a008"></script>
 <script>
 bbMontar('Calendário');
 let DADOS = null; let NARRADOR_LOGADO = false;
@@ -121,6 +121,7 @@ function fedSelo(j) {
 function posicao(j, clube) { const orig = clube === j.mand ? j.mandF : (clube === j.vis ? j.visF : clube); return DADOS.posicoes[[j.uf, chave(j.cat), chave(orig || clube)].join('|')]; }
 
 async function iniciar() {
+  bbVisita();
   const r = await bbApi({ acao: 'calendario' });
   if (!r.ok) { document.getElementById('lista').innerHTML = '<p class="aviso">' + bbEsc(r.erro || 'Não foi possível carregar o calendário.') + '</p>'; return; }
   DADOS = r; DADOS.videos = r.videos || {}; bbUnificar(r.jogos);

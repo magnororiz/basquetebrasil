@@ -76,3 +76,14 @@ function bbFedFundo(uf) { const f = BB_FED[uf]; if (!f) return '#4A5675'; const 
 function bbCat(c) { return String(c || '').replace(/sub\s*-?\s*(\d+)/i, 'Sub-$1').replace(/\bFEM(ININO)?\b/i, 'Feminino').replace(/\bMASC(ULINO)?\b/i, 'Masculino').trim(); }
 /* Se a CBB tirar um escudo do ar, a imagem quebrada some (o nome do time continua). */
 document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && /geniussports|sportradar/.test(t.src)) t.style.display = 'none'; }, true);
+/* Contador de visitas (igual ao Klaus TV): cada navegador conta 1 visita por dia; o total fica no motor. Mostra no elemento #bb-visitas, se existir. */
+function bbVisita() {
+  let novo = 0; const k = 'bb_visita_dia', hoje = new Date().toLocaleDateString('sv-SE');
+  try { if (localStorage.getItem(k) !== hoje) novo = 1; } catch (e) {}
+  bbApi({ acao: 'visita', novo: novo }).then(r => {
+    if (!r || !r.ok) return;
+    if (novo) { try { localStorage.setItem(k, hoje); } catch (e) {} }
+    const el = document.getElementById('bb-visitas');
+    if (el) { el.textContent = '👁 ' + Number(r.total).toLocaleString('pt-BR') + (r.total === 1 ? ' visita' : ' visitas'); el.style.display = ''; }
+  });
+}

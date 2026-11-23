@@ -278,6 +278,7 @@ select{font:inherit}
 <a href="https://wa.me/5521998092305?text=Ol%C3%A1%21%20Vi%20o%20site%20basquetebrasil.com%20e%20quero%20falar%20com%20voc%C3%AAs." target="_blank" rel="noopener" title="WhatsApp (21) 99809-2305" aria-label="WhatsApp" style="width:44px;height:44px;border-radius:50%;background:#0F3175;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/></svg></a>
 <a href="mailto:basquetebrasil.base@gmail.com" title="basquetebrasil.base@gmail.com" aria-label="E-mail" style="width:44px;height:44px;border-radius:50%;background:#0F3175;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
 </div>
+<div id="bb-visitas" style="display:none;align-self:flex-start;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,223,0,.45);color:#FFDF00;font-weight:700;font-size:13px" title="Visitas ao site (cada pessoa conta 1 vez por dia)"></div>
 </div>
 
 <div style="flex:0 1 160px;display:flex;flex-direction:column;gap:6px;font-size:14px">
@@ -325,7 +326,7 @@ select{font:inherit}
 </footer>
 
 </div>
-<script src="assets/bb.js?v=a007"></script>
+<script src="assets/bb.js?v=a008"></script>
 <script>
 (function () {
   const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
@@ -361,6 +362,7 @@ select{font:inherit}
     document.getElementById(id).innerHTML = lista.length ? lista.map(j => card(j, tipo, narr[j.id])).join('') : '<p class="hj-vazio">' + vazio + '</p>';
   }
   document.getElementById('hj-data').textContent = h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+  bbVisita();
   bbApi({ acao: 'calendario' }).then(r => {
     if (!r || !r.ok) { document.getElementById('hj-hoje').innerHTML = '<p class="hj-vazio">' + bbEsc((r && r.erro) || 'Não foi possível carregar os jogos.') + '</p>'; return; }
     const js = bbUnificar(r.jogos || []), narr = r.narradores || {};

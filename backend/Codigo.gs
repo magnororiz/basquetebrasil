@@ -29,6 +29,7 @@ function doPost(e) {
   let p = {};
   try { p = JSON.parse(e.postData.contents || '{}'); } catch (err) { return responder({ ok: false, erro: 'Pedido inválido.' }); }
   if (p.acao === 'calendario') return responder(calendario());
+  if (p.acao === 'visita') return responder(contarVisita(p.novo));
   if (p.acao === 'sugerirLink') { const l = LockService.getScriptLock(); l.waitLock(20000); try { return responder(sugerirLink(p.id, p.link)); } finally { l.releaseLock(); } }
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
@@ -326,3 +327,13 @@ function decidirVideo(token, linha, aprovar) {
 }
 /* Rode uma vez pelo editor depois de colar esta versão: autoriza o acesso ao YouTube (UrlFetch). */
 function autorizarYoutube() { Logger.log(JSON.stringify(infoYoutube('dQw4w9WgXcQ'))); }
+
+/* ================= CONTADOR DE VISITAS (igual ao Klaus TV; Magno, 23/11/2026) =================
+ * Início e Calendário chamam 'visita'. novo=1 só na 1ª visita do dia daquele navegador (soma 1); novo=0 só lê o total.
+ * O total fica nas Propriedades do script (chave 'visitas'). */
+function contarVisita(novo) {
+  const pr = PropertiesService.getScriptProperties(); const ler = () => Number(pr.getProperty('visitas') || 0);
+  if (!novo) return { ok: true, total: ler() };
+  const l = LockService.getScriptLock(); if (!l.tryLock(5000)) return { ok: true, total: ler() };
+  try { const t = ler() + 1; pr.setProperty('visitas', String(t)); return { ok: true, total: t }; } finally { l.releaseLock(); }
+}
