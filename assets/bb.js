@@ -42,3 +42,16 @@ function bbMontar(ativo) {
   const r = document.getElementById('bb-rodape');
   if (r) fetch('assets/rodape.html').then(x => x.text()).then(t => { r.innerHTML = t; }).catch(() => {});
 }
+
+/* Federações: sigla, nome, site e cores (cor principal + 2 faixas). Cores tiradas da bandeira do estado; CBI nas cores do site. */
+const BB_FED = {
+  BR: { sigla: 'CBI', nome: 'Nacional – CBI', site: 'https://www.cbb.com.br/', cores: ['#002776', '#FFDF00', '#009C3B'] },
+  DF: { sigla: 'FBDF', nome: 'Federação de Basquetebol do Distrito Federal', site: 'https://fbdf.com.br/', cores: ['#00753A', '#FFD100', '#FFFFFF'] },
+  RJ: { sigla: 'FBERJ', nome: 'Federação de Basquetebol do Estado do Rio de Janeiro', site: 'http://www.fberj.com.br/', cores: ['#0A4DA2', '#C9A227', '#FFFFFF'] },
+  RS: { sigla: 'FGB', nome: 'Federação Gaúcha de Basketball', site: 'https://basquetegaucho.com.br/', cores: ['#C8102E', '#00843D', '#FFD100'] },
+  SP: { sigla: 'FPB', nome: 'Federação Paulista de Basketball', site: 'https://fpb.com.br/', cores: ['#111111', '#E30613', '#FFFFFF'] }
+};
+/* Fundo do selo: duas faixas finas à esquerda + cor principal */
+function bbFedFundo(uf) { const f = BB_FED[uf]; if (!f) return '#4A5675'; const [a, b, c] = f.cores; return 'linear-gradient(90deg,' + b + ' 0 6px,' + c + ' 6px 10px,' + a + ' 10px)'; }
+/* "SUB 16 FEM" -> "Sub-16 Feminino" */
+function bbCat(c) { return String(c || '').replace(/sub\s*-?\s*(\d+)/i, 'Sub-$1').replace(/\bFEM(ININO)?\b/i, 'Feminino').replace(/\bMASC(ULINO)?\b/i, 'Masculino').trim(); }
