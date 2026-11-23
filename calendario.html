@@ -19,7 +19,7 @@ img{max-width:100%}
 .filtros label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675}
 .filtros select,.filtros input{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D3EA;border-radius:8px;background:#FFFFFF;color:#0B1B3F;min-width:160px}
 .dia{margin:28px 0 10px;font-size:22px;font-weight:700;color:#002776}
-.jogo{width:100%;display:grid;grid-template-columns:92px 1fr auto;gap:14px;align-items:center;text-align:left;background:#FFFFFF;border:1px solid #E3E7EF;border-radius:12px;padding:14px 16px;margin:0 0 10px;cursor:pointer;font:inherit;color:inherit}
+.jogo{width:100%;display:grid;grid-template-columns:150px 1fr auto;gap:14px;align-items:center;text-align:left;background:#FFFFFF;border:1px solid #E3E7EF;border-radius:12px;padding:14px 16px;margin:0 0 10px;cursor:pointer;font:inherit;color:inherit}
 .jogo:hover,.jogo:focus-visible{border-color:#009C3B;box-shadow:0 2px 10px rgba(0,39,118,.08);outline:none}
 .hora{font-weight:700;font-size:18px}
 .cat{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;background:#EEF1F6;color:#002776;border-radius:999px;padding:3px 10px;margin-top:4px}
@@ -29,6 +29,7 @@ img{max-width:100%}
 .sub{font-size:13px;color:#4A5675;margin-top:4px}
 .selo{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;white-space:nowrap}
 .cat.cbi{background:#FFDF00;color:#002776}
+.fedsel{display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;margin-top:6px;padding:5px 12px 5px 18px;border-radius:10px;color:#FFFFFF;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap;cursor:pointer;text-align:left}.fedsel b{font-size:12px;font-weight:800}.fedsel small{font-size:11px;font-weight:600}.fedsel:hover{filter:brightness(1.12)}
 .selo.n{background:#E7F5EC;color:#00752C}.selo.v{background:#F4F6FA;color:#8A94AD}
 .escudo{width:28px;height:28px;object-fit:contain;flex:none}
 .semlogo{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#EEF1F6;color:#8A94AD;font-size:9px;font-weight:700;flex:none}
@@ -64,7 +65,7 @@ img{max-width:100%}
 .forn input{flex:1 1 260px;font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D3EA;border-radius:8px}
 .bt{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:0;font:inherit;font-weight:700;cursor:pointer;background:#002776;color:#FFFFFF}
 .aviso{background:#FFFFFF;border:1px solid #E3E7EF;border-radius:12px;padding:24px;color:#4A5675}
-@media (max-width:640px){.jogo{grid-template-columns:70px 1fr}.jogo .selo{grid-column:1/-1;justify-self:start}.metades{grid-template-columns:1fr}.metade+.metade{border-left:0;border-top:1px solid #E3E7EF}}
+@media (max-width:640px){.jogo{grid-template-columns:130px 1fr}.jogo .selo{grid-column:1/-1;justify-self:start}.metades{grid-template-columns:1fr}.metade+.metade{border-left:0;border-top:1px solid #E3E7EF}}
 </style>
 </head>
 <body>
@@ -93,7 +94,7 @@ img{max-width:100%}
 </div>
 
 <div id="bb-rodape"></div>
-<script src="assets/bb.js"></script>
+<script src="assets/bb.js?v=a002"></script>
 <script>
 bbMontar('Calendário');
 let DADOS = null; let NARRADOR_LOGADO = false;
@@ -111,6 +112,11 @@ function realizado(j) { return /realizado|encerrado|finalizado/i.test(j.sit) || 
 function logo(j, clube, grande) {
   const src = bbEscudo(j.uf, clube);
   return src ? '<img class="escudo" src="' + src + '" alt="Escudo ' + bbEsc(clube) + '">' : '<span class="semlogo" aria-label="Sem logo">[logo]</span>';
+}
+function fedSelo(j) {
+  const f = BB_FED[j.uf]; const nome = f ? (j.uf === 'BR' ? 'CBI – Nacional' : f.sigla + ' – ' + j.uf) : j.uf;
+  return '<span class="fedsel" role="link" tabindex="0" title="' + bbEsc(f ? f.nome + ' – abrir o site' : '') + '" style="background:' + bbFedFundo(j.uf) + '"' +
+    (f ? ' onclick="event.stopPropagation();window.open(\'' + f.site + '\',\'_blank\',\'noopener\')"' : '') + '><b>' + bbEsc(nome) + '</b><small>' + bbEsc(bbCat(j.cat)) + '</small></span>';
 }
 function posicao(j, clube) { return DADOS.posicoes[[j.uf, chave(j.cat), chave(clube)].join('|')]; }
 
@@ -157,7 +163,7 @@ function desenhar() {
     const cm = w === 'm' ? 'venc' : (w === 'v' ? 'perd' : ''), cv = w === 'v' ? 'venc' : (w === 'm' ? 'perd' : '');
     const selo = n ? '<span class="selo n">🎙 ' + bbEsc(n.nome) + '</span>' : (vd ? '<span class="selo n">▶ Vídeo</span>' : '<span class="selo v">' + (per === 'real' ? 'Sem vídeo' : 'Sem narrador') + '</span>');
     html += '<button class="jogo" type="button" data-id="' + bbEsc(j.id) + '">' +
-      '<div><div class="hora">' + bbEsc(j.hora || '—') + '</div>' + (ehCBI(j) ? '<span class="cat cbi">Nacional – CBI · ' + bbEsc(j.cat) + '</span>' : '<span class="cat">' + bbEsc(j.uf + ' · ' + j.cat) + '</span>') + '</div>' +
+      '<div><div class="hora">' + bbEsc(j.hora || '—') + '</div>' + fedSelo(j) + '</div>' +
       '<div><div class="times">' + logo(j, j.mand) + '<span class="' + cm + '">' + bbEsc(j.mand) + '</span>' + (pl ? '<span class="placar">' + bbEsc(j.pm) + '</span>' : '') +
       '<span class="x">x</span>' + (pl ? '<span class="placar">' + bbEsc(j.pv) + '</span>' : '') + '<span class="' + cv + '">' + bbEsc(j.vis) + '</span>' + logo(j, j.vis) + '</div>' +
       '<div class="sub">' + bbEsc([j.camp, j.local].filter(Boolean).join(' · ')) + '</div></div>' + selo + '</button>';
