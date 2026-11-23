@@ -329,6 +329,7 @@ bbApi({ acao: 'atualizacoes' }).then(r => {
   if (!r || !r.ok || !(r.itens || []).length) { el.innerHTML = '<div style="padding:12px;border-radius:10px;background:#F4F6FA;font-size:13px;color:#4A5675">Sem informação de atualização no momento.</div>'; return; }
   const cor = { ok: ['#EAF6EE', '#00752C'], parcial: ['#FFF8DB', '#B58A00'], falhou: ['#FDECEC', '#C0392B'] };
   el.innerHTML = r.itens.map(i => {
+    if (/parcial/i.test(i.resultado || '')) i.situacao = 'parcial';
     const c = cor[i.situacao] || cor.falhou;
     const fed = i.fed ? 'Federação: ' + bbEsc(i.fed) : 'Federação não informa a data';
     const bk = i.backup ? 'Nosso backup: ' + bbEsc(i.backup) : 'Nosso backup: ainda sem dados';
