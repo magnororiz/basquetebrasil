@@ -29,6 +29,7 @@ function doPost(e) {
   let p = {};
   try { p = JSON.parse(e.postData.contents || '{}'); } catch (err) { return responder({ ok: false, erro: 'Pedido inválido.' }); }
   if (p.acao === 'calendario') return responder(calendario());
+  if (p.acao === 'atualizacoes') return responder(atualizacoes());
   if (p.acao === 'visita') return responder(contarVisita(p.novo));
   if (p.acao === 'sugerirLink') { const l = LockService.getScriptLock(); l.waitLock(20000); try { return responder(sugerirLink(p.id, p.link)); } finally { l.releaseLock(); } }
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
@@ -108,6 +109,33 @@ function calendario() {
   if (sv && sv.getLastRow() > 1) sv.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[2] && r[6] === 'Aprovado' && !videos[r[0]]) videos[r[0]] = { link: r[2], titulo: r[3], canal: r[4] }; });
   const res = { ok: true, gerado: agora(), fontes: fontes, jogos: jogos, posicoes: posicoes, narradores: narr, videos: videos };
   try { c.put('cal1', JSON.stringify(res), 300); } catch (e) {}
+  return res;
+}
+/* ================= ÚLTIMA ATUALIZAÇÃO (público) =================
+ * Lê a aba Log_Coletas de cada backup e devolve, para cada fonte (cestinhas, jogos, súmulas, classificação...),
+ * a linha mais recente: data em que a federação mexeu no arquivo/página (quando ela informa) e a data do nosso
+ * último backup que deu certo. Não inventa data: se a fonte não informa, vai vazio. */
+function atualizacoes() {
+  const c = CacheService.getScriptCache(); const hit = c.get('atu1'); if (hit) return JSON.parse(hit);
+  const itens = {};
+  const ok = r => /^(ok|sem mudan)/i.test(norm(r));
+  const dt = s => { const m = norm(s).match(/(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2}))?/); return m ? m[3] + m[2] + m[1] + (m[4] || '00') + (m[5] || '00') : ''; };
+  BACKUPS.forEach(b => {
+    let sh; try { sh = SpreadsheetApp.openById(b.id).getSheetByName('Log_Coletas'); } catch (e) { return; }
+    if (!sh || sh.getLastRow() < 2) return;
+    sh.getDataRange().getDisplayValues().slice(1).forEach(r => {
+      const fonte = norm(r[2]); if (!fonte) return;
+      const k = b.uf + '|' + fonte; const quando = dt(r[0]);
+      const it = itens[k] || (itens[k] = { uf: norm(r[1]) || b.uf, fonte: fonte, coleta: '', ordem: '', backup: '', fed: '', resultado: '' });
+      if (quando >= it.ordem) { it.ordem = quando; it.coleta = norm(r[0]); it.resultado = norm(r[3]);
+        const f = norm(r[6]); it.fed = /^\d{2}\//.test(f) ? f : ''; }
+      if (ok(r[3]) && quando >= dt(it.backup)) it.backup = norm(r[0]);
+    });
+  });
+  const lista = Object.keys(itens).map(k => itens[k]).sort((a, b) => b.ordem.localeCompare(a.ordem) || a.fonte.localeCompare(b.fonte));
+  lista.forEach(i => { i.situacao = ok(i.resultado) ? 'ok' : /parcial/i.test(i.resultado) ? 'parcial' : 'falhou'; if (/parcial/i.test(i.resultado) && dt(i.coleta) > dt(i.backup)) i.backup = i.coleta; delete i.ordem; });
+  const res = { ok: true, gerado: agora(), itens: lista };
+  try { c.put('atu1', JSON.stringify(res), 600); } catch (e) {}
   return res;
 }
 function limparCacheCalendario() { CacheService.getScriptCache().remove('cal1'); }

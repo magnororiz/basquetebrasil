@@ -66,13 +66,8 @@ select{font:inherit}
 <span class="h" style="font-size:22px;font-weight:700">Última atualização</span>
 <span style="font-size:12px;color:#4A5675">backup diário às 20h</span>
 </div>
-<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#EAF6EE">
-<span style="width:10px;height:10px;border-radius:50%;background:#00752C"></span>
-<div style="flex:1;display:flex;flex-direction:column"><strong>FBERJ · Rio de Janeiro</strong><span style="font-size:13px;color:#4A5675">Federação: [data/hora] · Nosso backup: [data] 20h</span></div>
-</div>
-<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#F4F6FA">
-<span style="width:10px;height:10px;border-radius:50%;background:#8A94AD"></span>
-<div style="flex:1;display:flex;flex-direction:column"><strong>Outras federações</strong><span style="font-size:13px;color:#4A5675">Em levantamento</span></div>
+<div id="atuLista" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;scrollbar-width:thin">
+<div style="padding:12px;border-radius:10px;background:#F4F6FA;font-size:13px;color:#4A5675">Carregando…</div>
 </div>
 <p style="margin:0;font-size:13px;color:#4A5675;line-height:1.5">Se a federação atrasar, a data mostra de onde vem o atraso. Se ela tirar os dados do ar, o site continua com o último backup.</p>
 </div>
@@ -328,6 +323,21 @@ select{font:inherit}
 </div>
 <script src="assets/bb.js?v=a008"></script>
 <script>
+/* Última atualização: uma linha por arquivo/fonte, lida do Log_Coletas dos backups */
+bbApi({ acao: 'atualizacoes' }).then(r => {
+  const el = document.getElementById('atuLista'); if (!el) return;
+  if (!r || !r.ok || !(r.itens || []).length) { el.innerHTML = '<div style="padding:12px;border-radius:10px;background:#F4F6FA;font-size:13px;color:#4A5675">Sem informação de atualização no momento.</div>'; return; }
+  const cor = { ok: ['#EAF6EE', '#00752C'], parcial: ['#FFF8DB', '#B58A00'], falhou: ['#FDECEC', '#C0392B'] };
+  el.innerHTML = r.itens.map(i => {
+    const c = cor[i.situacao] || cor.falhou;
+    const fed = i.fed ? 'Federação: ' + bbEsc(i.fed) : 'Federação não informa a data';
+    const bk = i.backup ? 'Nosso backup: ' + bbEsc(i.backup) : 'Nosso backup: ainda sem dados';
+    const aviso = i.situacao === 'falhou' ? '<br><span style="color:' + c[1] + '">Última tentativa (' + bbEsc(i.coleta) + ') não gravou</span>' : i.situacao === 'parcial' ? '<br><span style="color:' + c[1] + '">Backup parcial</span>' : '';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:' + c[0] + '"><span style="flex:0 0 10px;width:10px;height:10px;border-radius:50%;background:' + c[1] + '"></span>' +
+      '<div style="flex:1;display:flex;flex-direction:column"><strong style="font-size:15px">' + bbEsc(i.fonte) + ' · ' + bbEsc(i.uf) + '</strong><span style="font-size:13px;color:#4A5675">' + fed + ' · ' + bk + aviso + '</span></div></div>';
+  }).join('');
+});
+
 (function () {
   const dataNum = d => { const m = String(d).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Number(m[3] + m[2] + m[1]) : 0; };
   const h = new Date(); const hoje = h.getFullYear() * 10000 + (h.getMonth() + 1) * 100 + h.getDate();
