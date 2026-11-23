@@ -94,7 +94,7 @@ img{max-width:100%}
 </div>
 
 <div id="bb-rodape"></div>
-<script src="assets/bb.js?v=a003"></script>
+<script src="assets/bb.js?v=a004"></script>
 <script>
 bbMontar('Calendário');
 let DADOS = null; let NARRADOR_LOGADO = false;
@@ -118,12 +118,12 @@ function fedSelo(j) {
   return '<span class="fedsel" role="link" tabindex="0" title="' + bbEsc(f ? f.nome + ' – abrir o site' : '') + '" style="background:' + bbFedFundo(j.uf) + '"' +
     (f ? ' onclick="event.stopPropagation();window.open(\'' + f.site + '\',\'_blank\',\'noopener\')"' : '') + '><b>' + bbEsc(nome) + '</b><small>' + bbEsc(bbCat(j.cat)) + '</small></span>';
 }
-function posicao(j, clube) { return DADOS.posicoes[[j.uf, chave(j.cat), chave(clube)].join('|')]; }
+function posicao(j, clube) { const orig = clube === j.mand ? j.mandF : (clube === j.vis ? j.visF : clube); return DADOS.posicoes[[j.uf, chave(j.cat), chave(orig || clube)].join('|')]; }
 
 async function iniciar() {
   const r = await bbApi({ acao: 'calendario' });
   if (!r.ok) { document.getElementById('lista').innerHTML = '<p class="aviso">' + bbEsc(r.erro || 'Não foi possível carregar o calendário.') + '</p>'; return; }
-  DADOS = r; DADOS.videos = r.videos || {};
+  DADOS = r; DADOS.videos = r.videos || {}; bbUnificar(r.jogos);
   const fedsCal = {}; r.jogos.forEach(j => { if (!fedsCal[j.uf]) fedsCal[j.uf] = j.fed; });
   const ufsCal = Object.keys(fedsCal).sort(ordemFed);
   document.getElementById('fontes').textContent = ufsCal.length ? 'No calendário: ' + ufsCal.map(u => rotuloFed(u, fedsCal[u])).join(', ') + ' · atualizado em ' + r.gerado : '';
@@ -239,7 +239,7 @@ function abrir(id) {
   const fe = janela.querySelector('.forn'); if (fe) fe.addEventListener('submit', async e => { e.preventDefault(); const m = janela.querySelector('.fornMsg'); m.textContent = 'Conferindo o link…';
     const r = await bbApi({ acao: 'sugerirLink', id: j.id, link: fe.querySelector('input').value });
     m.textContent = r.ok ? r.msg : r.erro; m.style.color = r.ok ? '#00752C' : '#A01616';
-    if (r.ok && r.aprovado) { const r2 = await bbApi({ acao: 'calendario' }); if (r2.ok) { DADOS = r2; DADOS.videos = r2.videos || {}; desenhar(); abrir(j.id); } } });
+    if (r.ok && r.aprovado) { const r2 = await bbApi({ acao: 'calendario' }); if (r2.ok) { DADOS = r2; DADOS.videos = r2.videos || {}; bbUnificar(r2.jogos); desenhar(); abrir(j.id); } } });
   janela.querySelector('.fechar').addEventListener('click', fechar);
 }
 function fechar() { fundo.classList.remove('aberto'); if (ultimoFoco) ultimoFoco.focus(); }
