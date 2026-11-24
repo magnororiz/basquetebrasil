@@ -76,23 +76,26 @@ select{font:inherit}
 
 <!-- BUSCA -->
 <section id="atletas" style="max-width:1200px;width:100%;box-sizing:border-box;margin:-36px auto 0;padding:0 24px">
-<form style="background:#FFFFFF;border-radius:14px;padding:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;box-shadow:0 8px 24px rgba(0,20,60,.10)">
-<label style="flex:2 1 240px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Atleta
-<input type="search" placeholder="Nome ou apelido" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 12px;font:inherit;font-size:15px;color:#0B1B3F">
+<form id="rkForm" onsubmit="return false" style="background:#FFFFFF;border-radius:14px;padding:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;box-shadow:0 8px 24px rgba(0,20,60,.10)">
+<label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Campeonato
+<select id="rkCamp" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="Estadual">Estaduais</option><option value="CBI">CBI</option></select>
 </label>
 <label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Estado
-<select style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option>Todos</option><option>RJ</option></select>
+<select id="rkUf" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="">Todos</option></select>
 </label>
 <label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Categoria
-<select style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option>Sub-15</option><option>Sub-12</option><option>Sub-13</option><option>Sub-14</option><option>Sub-16</option><option>Sub-17</option></select>
+<select id="rkCat" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="">Todas</option><option value="12">Sub-12</option><option value="13">Sub-13</option><option value="14">Sub-14</option><option value="15">Sub-15</option><option value="16">Sub-16</option><option value="17">Sub-17</option></select>
 </label>
 <label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Naipe
-<select style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option>Masculino</option><option>Feminino</option></select>
+<select id="rkNaipe" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="">Todos</option><option value="M">Masculino</option><option value="F">Feminino</option></select>
 </label>
 <label style="flex:1 1 160px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Time
-<select style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option>Todos</option></select>
+<select id="rkTime" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="">Todos</option></select>
 </label>
-<button type="button" style="min-height:44px;padding:0 22px;border:0;border-radius:8px;background:#00752C;color:#FFFFFF;font:inherit;font-weight:700;font-size:15px;cursor:pointer">Buscar</button>
+<label style="flex:2 1 240px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Atleta
+<input id="rkNome" type="search" placeholder="Nome do atleta" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 12px;font:inherit;font-size:15px;color:#0B1B3F">
+</label>
+<button id="rkBuscar" type="button" style="min-height:44px;padding:0 22px;border:0;border-radius:8px;background:#00752C;color:#FFFFFF;font:inherit;font-weight:700;font-size:15px;cursor:pointer">Buscar</button>
 </form>
 </section>
 
@@ -100,30 +103,25 @@ select{font:inherit}
 <section id="rankings" style="max-width:1200px;width:100%;box-sizing:border-box;margin:0 auto;padding:56px 24px 0;display:flex;flex-wrap:wrap;gap:24px">
 <div style="flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:16px">
 <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
-<h2 class="h" style="margin:0;font-size:40px;font-weight:800">Ranking nacional · Sub-15 masculino</h2>
+<h2 id="rkTitulo" class="h" style="margin:0;font-size:40px;font-weight:800">Ranking nacional · Estaduais</h2>
 <span style="font-size:13px;color:#4A5675">Fonte de cada número: súmula da federação ou estatística do narrador</span>
 </div>
 <div role="tablist" aria-label="Fundamento" style="display:flex;flex-wrap:wrap;gap:8px">
 <button type="button" role="tab" aria-selected="true" style="min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#002776;color:#FFFFFF;font:inherit;font-weight:600">Pontos</button>
-<button type="button" role="tab" aria-selected="false" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Rebotes</button>
-<button type="button" role="tab" aria-selected="false" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Assistências</button>
-<button type="button" role="tab" aria-selected="false" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Tocos</button>
-<button type="button" role="tab" aria-selected="false" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Roubos</button>
-<button type="button" role="tab" aria-selected="false" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Eficiência</button>
+<button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Rebotes</button>
+<button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Assistências</button>
+<button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Tocos</button>
+<button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Roubos</button>
+<button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Eficiência</button>
 </div>
 <div style="background:#FFFFFF;border-radius:14px;overflow-x:auto">
 <table>
-<thead><tr><th>#</th><th>Atleta</th><th>Time</th><th>UF</th><th>Jogos</th><th>PTS</th><th>Média</th><th>Fonte</th></tr></thead>
-<tbody>
-<tr><td><span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:#FFDF00;color:#002776;font-weight:700;align-items:center;justify-content:center">1</span></td><td><strong>[Nome Sobrenome]</strong><br><span style="font-size:13px;color:#4A5675">[apelido]</span></td><td>[Time]</td><td>RJ</td><td>[J]</td><td><strong>[PTS]</strong></td><td>[média]</td><td style="font-size:13px;color:#4A5675">FBERJ</td></tr>
-<tr><td><span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:#DCE1EA;color:#0B1B3F;font-weight:700;align-items:center;justify-content:center">2</span></td><td><strong>[Nome Sobrenome]</strong><br><span style="font-size:13px;color:#4A5675">[apelido]</span></td><td>[Time]</td><td>[UF]</td><td>[J]</td><td><strong>[PTS]</strong></td><td>[média]</td><td style="font-size:13px;color:#4A5675">[federação]</td></tr>
-<tr><td><span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:#F0D9C2;color:#5A3410;font-weight:700;align-items:center;justify-content:center">3</span></td><td><strong>[Nome Sobrenome]</strong><br><span style="font-size:13px;color:#4A5675">[apelido]</span></td><td>[Time]</td><td>[UF]</td><td>[J]</td><td><strong>[PTS]</strong></td><td>[média]</td><td style="font-size:13px;color:#4A5675">[federação]</td></tr>
-<tr><td style="padding-left:22px">4</td><td><strong>[Nome Sobrenome]</strong><br><span style="font-size:13px;color:#4A5675">[apelido]</span></td><td>[Time]</td><td>[UF]</td><td>[J]</td><td><strong>[PTS]</strong></td><td>[média]</td><td style="font-size:13px;color:#4A5675">[federação]</td></tr>
-<tr><td style="padding-left:22px">5</td><td><strong>[Nome Sobrenome]</strong><br><span style="font-size:13px;color:#4A5675">[apelido]</span></td><td>[Time]</td><td>[UF]</td><td>[J]</td><td><strong>[PTS]</strong></td><td>[média]</td><td style="font-size:13px;color:#4A5675">[federação]</td></tr>
-</tbody>
+<thead><tr><th>#</th><th>Atleta</th><th>Time</th><th>UF</th><th>Cat.</th><th>Jogos</th><th>PTS</th><th>Média</th><th>Fonte</th></tr></thead>
+<tbody id="rkCorpo"><tr><td colspan="9" style="color:#4A5675">Carregando ranking…</td></tr></tbody>
 </table>
 </div>
-<a href="#rankings" style="align-self:flex-start;font-weight:600">Ver ranking completo →</a>
+<span id="rkInfo" style="font-size:13px;color:#4A5675"></span>
+<a id="rkMais" href="#rankings" style="align-self:flex-start;font-weight:600">Ver ranking completo →</a>
 </div>
 
 <aside style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px">
@@ -323,6 +321,41 @@ select{font:inherit}
 </div>
 <script src="assets/bb.js?v=a008"></script>
 <script>
+/* Ranking de cestinhas: Campeonato (Estaduais | CBI) separa as bases; pontos do CBI nunca somam no estadual */
+(function () {
+  let LIN = [], todos = false;
+  const $ = id => document.getElementById(id);
+  const num = x => { const n = parseFloat(String(x).replace(',', '.')); return isNaN(n) ? -1 : n; };
+  const medalha = i => i < 3 ? '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:' + ['#FFDF00', '#DCE1EA', '#F0D9C2'][i] + ';color:' + ['#002776', '#0B1B3F', '#5A3410'][i] + ';font-weight:700;align-items:center;justify-content:center">' + (i + 1) + '</span>' : '<span style="padding-left:9px">' + (i + 1) + '</span>';
+  const base = () => LIN.filter(l => l.tipo === $('rkCamp').value);
+  function opcoes(sel, vals, rotulo) { const v = sel.value; sel.innerHTML = '<option value="">' + rotulo + '</option>' + vals.map(x => '<option>' + bbEsc(x) + '</option>').join(''); if (vals.includes(v)) sel.value = v; }
+  function filtros() {
+    const b = base(); opcoes($('rkUf'), [...new Set(b.map(l => l.uf))].sort(), 'Todos');
+    const uf = $('rkUf').value; opcoes($('rkTime'), [...new Set(b.filter(l => !uf || l.uf === uf).map(l => bbNomeLimpo(l.clube)))].sort(), 'Todos');
+  }
+  function mostrar() {
+    const uf = $('rkUf').value, cat = $('rkCat').value, nai = $('rkNaipe').value, tm = $('rkTime').value, nome = bbChave($('rkNome').value);
+    const f = base().filter(l => (!uf || l.uf === uf) && (!cat || l.sub === +cat) && (!nai || l.naipe === nai || l.naipe === 'X') && (!tm || bbNomeLimpo(l.clube) === tm) && (!nome || bbChave(l.atleta).includes(nome)))
+      .sort((a, b) => num(b.pontos) - num(a.pontos) || num(b.media) - num(a.media));
+    const camp = $('rkCamp').value === 'CBI' ? 'CBI' : 'Estaduais';
+    $('rkTitulo').textContent = 'Ranking nacional · ' + camp + (cat ? ' · Sub-' + cat : '') + (nai ? (nai === 'M' ? ' masculino' : ' feminino') : '') + (uf ? ' · ' + uf : '');
+    const vis = todos ? f : f.slice(0, 10);
+    $('rkCorpo').innerHTML = vis.length ? vis.map((l, i) => '<tr><td>' + medalha(i) + '</td><td><strong>' + bbEsc(l.atleta) + '</strong></td><td>' + bbEsc(bbNomeLimpo(l.clube)) + '</td><td>' + bbEsc(l.uf) + '</td><td>' + bbEsc(bbCat('Sub ' + l.sub)) + (l.naipe === 'F' ? ' F' : l.naipe === 'X' ? ' misto' : '') + '</td><td>' + bbEsc(l.jogos) + '</td><td><strong>' + bbEsc(l.pontos) + '</strong></td><td>' + bbEsc(l.media) + '</td><td style="font-size:13px;color:#4A5675">' + bbEsc(l.fed + (l.camp ? ' · ' + l.camp : '')) + (/soma do basquete brasil/i.test(l.fonte) ? '<br>soma nossa jogo a jogo (parcial)' : '') + '</td></tr>').join('')
+      : '<tr><td colspan="9" style="color:#4A5675">' + (camp === 'CBI' && !base().length ? 'Os cestinhas do CBI ainda não foram lançados no nosso backup.' : 'Nenhum atleta com esses filtros.') + '</td></tr>';
+    $('rkInfo').textContent = f.length ? f.length + ' atletas' + (vis.length < f.length ? ' · mostrando os 10 primeiros' : '') : '';
+    $('rkMais').style.display = f.length > 10 ? '' : 'none'; $('rkMais').textContent = todos ? 'Mostrar só os 10 primeiros ↑' : 'Ver ranking completo →';
+  }
+  ['rkCamp', 'rkUf'].forEach(id => $(id).addEventListener('change', () => { filtros(); todos = false; mostrar(); }));
+  ['rkCat', 'rkNaipe', 'rkTime'].forEach(id => $(id).addEventListener('change', () => { todos = false; mostrar(); }));
+  $('rkBuscar').addEventListener('click', () => { todos = false; mostrar(); document.getElementById('rankings').scrollIntoView({ behavior: 'smooth' }); });
+  $('rkNome').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('rkBuscar').click(); } });
+  $('rkMais').addEventListener('click', e => { e.preventDefault(); todos = !todos; mostrar(); });
+  bbApi({ acao: 'ranking' }).then(r => {
+    if (!r || !r.ok) { $('rkCorpo').innerHTML = '<tr><td colspan="9" style="color:#4A5675">Ranking indisponível no momento.</td></tr>'; return; }
+    LIN = r.linhas || []; filtros(); mostrar();
+  });
+})();
+
 /* Última atualização: uma linha por arquivo/fonte, lida do Log_Coletas dos backups */
 bbApi({ acao: 'atualizacoes' }).then(r => {
   const el = document.getElementById('atuLista'); if (!el) return;

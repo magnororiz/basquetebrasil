@@ -29,6 +29,7 @@ function doPost(e) {
   let p = {};
   try { p = JSON.parse(e.postData.contents || '{}'); } catch (err) { return responder({ ok: false, erro: 'Pedido inválido.' }); }
   if (p.acao === 'calendario') return responder(calendario());
+  if (p.acao === 'ranking') return responder(ranking());
   if (p.acao === 'atualizacoes') return responder(atualizacoes());
   if (p.acao === 'visita') return responder(contarVisita(p.novo));
   if (p.acao === 'sugerirLink') { const l = LockService.getScriptLock(); l.waitLock(20000); try { return responder(sugerirLink(p.id, p.link)); } finally { l.releaseLock(); } }
@@ -109,6 +110,30 @@ function calendario() {
   if (sv && sv.getLastRow() > 1) sv.getDataRange().getDisplayValues().slice(1).forEach(r => { if (r[0] && r[2] && r[6] === 'Aprovado' && !videos[r[0]]) videos[r[0]] = { link: r[2], titulo: r[3], canal: r[4] }; });
   const res = { ok: true, gerado: agora(), fontes: fontes, jogos: jogos, posicoes: posicoes, narradores: narr, videos: videos };
   try { c.put('cal1', JSON.stringify(res), 300); } catch (e) {}
+  return res;
+}
+/* ================= RANKING DE CESTINHAS (público) =================
+ * Lê a aba Cestinhas de cada backup. Campeonato: "CBI" (backup CBI) ou "Estadual" (federações).
+ * As bases nunca se misturam: o site filtra por campeonato antes de ordenar. Números exatamente como estão no backup. */
+function ranking() {
+  const c = CacheService.getScriptCache(); const hit = c.get('rk1'); if (hit) return JSON.parse(hit);
+  const lin = [];
+  BACKUPS.forEach(b => {
+    let sh; try { sh = SpreadsheetApp.openById(b.id).getSheetByName('Cestinhas'); } catch (e) { return; }
+    if (!sh || sh.getLastRow() < 2) return;
+    const v = sh.getDataRange().getDisplayValues(); const cab = v[0].map(chave); const ix = n => cab.indexOf(chave(n));
+    const I = { uf: ix('UF'), fed: ix('Federação'), camp: ix('Campeonato'), cat: ix('Categoria'), atl: ix('Atleta'), clube: ix('Clube'), j: ix('Jogos'), p: ix('Pontos'), m: ix('Média'), c3: ix('Cestas de 3'), fonte: ix('Fonte (link)'), atu: ix('Última atualização na fonte (data/hora)') };
+    const g = (r, k) => I[k] >= 0 ? norm(r[I[k]]) : '';
+    v.slice(1).forEach(r => {
+      const atl = g(r, 'atl'), pts = g(r, 'p'); if (!atl || pts === '') return;
+      const cat = g(r, 'cat'); const n = (cat.match(/(\d{2})/) || [])[1]; if (!n || +n < 12 || +n > 17) return;
+      const naipe = /fem/i.test(cat) ? 'F' : /misto/i.test(cat) ? 'X' : 'M';
+      lin.push({ tipo: b.uf === 'CBI' ? 'CBI' : 'Estadual', uf: g(r, 'uf') || b.uf, fed: g(r, 'fed'), camp: g(r, 'camp'), sub: +n, naipe: naipe,
+        atleta: atl, clube: g(r, 'clube'), jogos: g(r, 'j'), pontos: pts, media: g(r, 'm'), c3: g(r, 'c3'), fonte: g(r, 'fonte'), atu: g(r, 'atu') });
+    });
+  });
+  const res = { ok: true, gerado: agora(), linhas: lin };
+  try { c.put('rk1', JSON.stringify(res), 600); } catch (e) {}
   return res;
 }
 /* ================= ÚLTIMA ATUALIZAÇÃO (público) =================
