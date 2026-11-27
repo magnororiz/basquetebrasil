@@ -78,7 +78,7 @@ select{font:inherit}
 <section id="atletas" style="max-width:1200px;width:100%;box-sizing:border-box;margin:-36px auto 0;padding:0 24px">
 <form id="rkForm" onsubmit="return false" style="background:#FFFFFF;border-radius:14px;padding:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;box-shadow:0 8px 24px rgba(0,20,60,.10)">
 <label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Campeonato
-<select id="rkCamp" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="Estadual">Estaduais</option><option value="CBI">CBI</option></select>
+<select id="rkCamp" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="Estadual">Estaduais</option><option value="CBI" selected>CBI</option></select>
 </label>
 <label style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A5675">Estado
 <select id="rkUf" style="min-height:44px;border:1px solid #C9D0DE;border-radius:8px;padding:0 10px;font-size:15px;color:#0B1B3F;background:#FFFFFF"><option value="">Todos</option></select>
@@ -103,7 +103,7 @@ select{font:inherit}
 <section id="rankings" style="max-width:1200px;width:100%;box-sizing:border-box;margin:0 auto;padding:56px 24px 0;display:flex;flex-wrap:wrap;gap:24px">
 <div style="flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:16px">
 <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
-<h2 id="rkTitulo" class="h" style="margin:0;font-size:40px;font-weight:800">Ranking nacional · Estaduais</h2>
+<h2 id="rkTitulo" class="h" style="margin:0;font-size:40px;font-weight:800">Ranking nacional · CBI · Sub-15</h2>
 <span style="font-size:13px;color:#4A5675">Fonte de cada número: súmula da federação ou estatística do narrador</span>
 </div>
 <div role="tablist" aria-label="Fundamento" style="display:flex;flex-wrap:wrap;gap:8px">
@@ -116,7 +116,7 @@ select{font:inherit}
 </div>
 <div style="background:#FFFFFF;border-radius:14px;overflow-x:auto">
 <table>
-<thead><tr><th>#</th><th>Atleta</th><th>Time</th><th>UF</th><th>Cat.</th><th>Jogos</th><th>PTS</th><th>Média</th><th>Fonte</th></tr></thead>
+<thead><tr><th>#</th><th>Atleta</th><th>Time</th><th>UF</th><th>Cat.</th><th title="Jogos">JG</th><th>PTS</th><th>Média</th><th>Fonte</th></tr></thead>
 <tbody id="rkCorpo"><tr><td colspan="9" style="color:#4A5675">Carregando ranking…</td></tr></tbody>
 </table>
 </div>
@@ -328,19 +328,29 @@ select{font:inherit}
   const num = x => { const n = parseFloat(String(x).replace(',', '.')); return isNaN(n) ? -1 : n; };
   const medalha = i => i < 3 ? '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:' + ['#FFDF00', '#DCE1EA', '#F0D9C2'][i] + ';color:' + ['#002776', '#0B1B3F', '#5A3410'][i] + ';font-weight:700;align-items:center;justify-content:center">' + (i + 1) + '</span>' : '<span style="padding-left:9px">' + (i + 1) + '</span>';
   const base = () => LIN.filter(l => l.tipo === $('rkCamp').value);
+  /* Escudos do CBI: link da imagem publicada pela CBB (não guardamos cópia). Sem escudo, aparece o nome do time. */
+  const LOGO_CBI = {"ESPORTE CLUBE PINHEIROS":"15b669de54b550bb3faeac218c370094L1.png","CAMPINEIRO DE REGATAS":"29fb3d6990fe4ab714b2e73fff772e9fL1.png","OLYMPICO CLUB":"41dd5215475c1a634ffc93d1434a49ddL1.png","PAULISTANO":"4eb2ec30aa9a8923178c35ce116fc247L1.png","MOGI BASQUETE":"e49903705fa4568debf7cf49fe8c5561T1.png","MINAS TENIS CLUBE":"008cd5ede5f56339e95ebffdd39ffe56L1.png","CLUBE CURITIBANO":"5bc27d3b0e468ace4fce84604225ec9dL1.png","FLUMINENSE FOOTBALL CLUB":"0aca3ecf73d192d271e7c128bae80976M1.png","BOTAFOGO DE F R":"ef6122cf9145af8ebdd152a7d26a48a7L1.png","SOGIPA":"ab9b1c9669f531ced0c3f562b8f27f4cM1.png","SESI FRANCA":"1a0e1cd1e857e499d908721ac43a8dc8L1.png","SOCIEDADE THALIA":"0eb99521e4d3c59625444175a0f5c083T1.png","FOZ BASQUETE":"ac897538a83724630f59f2856a3c2295S1.png","TIJUCA TENIS CLUBE":"1782d36c8a36fb8fd120e9065b4099e0M1.png","FLAMENGO":"b8e5dcfdbbcd3ed1e824c5e30f802e5dM1.png","SC CORINTHIANS PAULISTA":"bc0248b5fc71fc239ff522502d8e77e6M1.png","ADIEE":"0534868fb437c2fda914d2c003f10a40T1.png","ASSEJUF":"5087ddb92b8f81010e659bfaaa65ca21M1.png","CEAT":"e1acddf2bd0c26c6fc1d524727d2004eM1.png","AEROCLUBE":"0de3e78ee3e3115e6acb5766a3c17784M1.png","RECREIO DA JUVENTUDE":"9a3181e2b4c161a788e62078db28b6c6S1.png","CLUBE HEBRAICA":"e91a84c2bf04f182d9fcf8535f202ba4M1.png","HIPICA DE CAMPINAS":"f1d3d602cb9e68264645bc0a3acb6616T1.png","EC GINASTICO":"e07225811f861d278729fba65433eae6S1.png","APAGEBASK":"25a4cd602a6704db30568b260590d24cL1.png","CLUBE ALVARES CABRAL":"4a78fbd896c73db840af62d4b49a43f7S1.png","INSTITUTO VIVA VIDA":"26f498b411694386fe17115ca726d689L1.png","UNIAO CORINTHIANS":"8b0ae6a6e8f2ef133c6596966846af21L1.png","CLUBE DO REMO":"cbcb25b3e4601a7f01d445c39a2a63b4M1.png","AACB BRASILIA BASQUETE":"9f185035d2b56017661fc8d2f14bf406M1.png","SAO BERNARDO":"9130260132d9247a0294acbe312d1e55L1.png","XAXIM":"4014c5ea1809236808232617e6104531L1.png","GREMIO NAUTICO UNIAO":"9e8146c78693d3dd307da57ed51b2afaL1.png","ASSEMBLEIA PARAENSE":"b2632dc39456d116c389aceaa4762ebdM1.png","CLUBE DUQUE DE CAXIAS":"16ef73108312fd8fc4342515d5faf7f5S1.png","AJAB":"9fb62dc913e689179810304e4f78d1f4T1.png","CAXANGA GOLF":"f4e983d17a4ad907a7e28b51e38ec1bcM1.png","FILADELFIA BASQUETE":"1779e560a0bcaa7e74d30ec282570127S1.png","CLUBE CIRCULO MILITAR":"55a4bf246727b645f91d01ba092f390bM1.png","BNB FORTALEZA":"e62cdc8748dcc2977d5472f1acbf8d81M1.png","APVE LONDRINA":"9045b0994d7bca24a6286d76aa957df6L1.png","CERRADO BASQUETE":"debeba977c14403ba1c9198954b17147M1.png","CLUBE VIZINHANCA":"8871f096cfc110f80b1eb2ef99c01efbT1.png","MOVEON BASKET":"fbfdfc6823c964a1e4297d19b1a92fdaL1.png","SR MAMPITUBA":"14685f923f4f6b23e8ea097d5432e0a1L1.png","NILTON LINS":"01038d825180bd7e7dc99daed91ef6b9L1.png","BC BASKETBALL":"c38a76c106d4a17af8f0288cacda5280L1.png","NITEROI BC":"0baed8307ec44c81e3a7c9422ef5dfc5M1.png","CABANGA":"88d72c8c208ba25a00c4a24b19b07f46L1.png","DEFENSORES":"6bb91b02b3aee0ade8ed75c16b3b6bfaL1.png","CTC TEAM":"84dc815b3f8a8cd538565f11d83dd4e9L1.png","CAMPO GRANDE":"c3567c3f29549bbcb91cf4372976a3d9L1.png","SALDANHA DA GAMA":"9d37610c640e3cdd5ccbdeadcc2179a7M1.png","AMZ SPORTS":"dcb8075e069ccf9ea5e2f9e6d5d459ebL1.png","LDPG PONTA GROSSA":"7656ef867478faae964642144536e938M1.png","CLUBE DE ENGENHARIA":"7a2cee9cc70ccab06c3dca2fceda8605M1.png","IDEC":"433d77cfbca5c5b7d574bcfb834e029aS1.png","CENTRO OLIMPICO":"df75861863955a2e99e86ca4c908aec6S1.png","PAINEIRAS DO MORUMBY":"fb7c0cdb875adfb5a74f8ae6dd242cf2M1.png","DESPORTIVO RIO GRANDE":"96a5f110793aaabd45cc477f0c6be447L1.png","EC VITORIA":"8d4baef36692b23a98227817b6344715S1.png","CIRCULO MILITAR SP":"5ca96396bf43ed158086ae1f7a93bfd1M1.png","SOJAO BASQUETE":"1f34fc6c57fd024b5262280c574923e8M1.png","CTC TEAM BANESE":"31c73e55bf921204635e77bdb61abcf4M1.png","AACB BRASILIA":"e12da1803220f51a301d547aeb20d37cM1.png"};
+  function escudoTime(l) {
+    const nome = bbNomeLimpo(l.clube);
+    const src = l.tipo === 'CBI' ? (LOGO_CBI[bbChave(nome)] ? 'https://images.statsengine.playbyplay.api.geniussports.com/' + LOGO_CBI[bbChave(nome)] : '') : bbEscudo(l.uf, l.clube);
+    return src ? '<img src="' + bbEsc(src) + '" alt="' + bbEsc(nome) + '" title="' + bbEsc(nome) + '" style="height:32px;width:32px;object-fit:contain;display:block" onerror="this.replaceWith(document.createTextNode(this.alt))">' : bbEsc(nome);
+  }
   function opcoes(sel, vals, rotulo) { const v = sel.value; sel.innerHTML = '<option value="">' + rotulo + '</option>' + vals.map(x => '<option>' + bbEsc(x) + '</option>').join(''); if (vals.includes(v)) sel.value = v; }
   function filtros() {
     const b = base(); opcoes($('rkUf'), [...new Set(b.map(l => l.uf))].sort(), 'Todos');
+    /* Categoria: só as que existem no campeonato escolhido (o CBI só tem Sub-15 e Sub-17) */
+    const sc = $('rkCat'), vc = sc.value, subs = [...new Set(b.map(l => l.sub))].filter(n => n > 0).sort((x, y) => x - y);
+    sc.innerHTML = '<option value="">Todas</option>' + subs.map(n => '<option value="' + n + '">Sub-' + n + '</option>').join(''); if (subs.includes(+vc)) sc.value = vc;
     const uf = $('rkUf').value; opcoes($('rkTime'), [...new Set(b.filter(l => !uf || l.uf === uf).map(l => bbNomeLimpo(l.clube)))].sort(), 'Todos');
   }
   function mostrar() {
     const uf = $('rkUf').value, cat = $('rkCat').value, nai = $('rkNaipe').value, tm = $('rkTime').value, nome = bbChave($('rkNome').value);
     const f = base().filter(l => (!uf || l.uf === uf) && (!cat || l.sub === +cat) && (!nai || l.naipe === nai || l.naipe === 'X') && (!tm || bbNomeLimpo(l.clube) === tm) && (!nome || bbChave(l.atleta).includes(nome)))
-      .sort((a, b) => num(b.pontos) - num(a.pontos) || num(b.media) - num(a.media));
+      .sort((a, b) => num(b.media) - num(a.media) || num(b.pontos) - num(a.pontos)); /* ordem pela média; empate: mais pontos */
     const camp = $('rkCamp').value === 'CBI' ? 'CBI' : 'Estaduais';
     $('rkTitulo').textContent = 'Ranking nacional · ' + camp + (cat ? ' · Sub-' + cat : '') + (nai ? (nai === 'M' ? ' masculino' : ' feminino') : '') + (uf ? ' · ' + uf : '');
     const vis = todos ? f : f.slice(0, 10);
-    $('rkCorpo').innerHTML = vis.length ? vis.map((l, i) => '<tr><td>' + medalha(i) + '</td><td><strong>' + bbEsc(l.atleta) + '</strong></td><td>' + bbEsc(bbNomeLimpo(l.clube)) + '</td><td>' + bbEsc(l.uf) + '</td><td>' + bbEsc(bbCat('Sub ' + l.sub)) + (l.naipe === 'F' ? ' F' : l.naipe === 'X' ? ' misto' : '') + '</td><td>' + bbEsc(l.jogos) + '</td><td><strong>' + bbEsc(l.pontos) + '</strong></td><td>' + bbEsc(l.media) + '</td><td style="font-size:13px;color:#4A5675">' + bbEsc(l.fed + (l.camp ? ' · ' + l.camp : '')) + (/soma do basquete brasil/i.test(l.fonte) ? '<br>soma nossa jogo a jogo (parcial)' : '') + '</td></tr>').join('')
+    $('rkCorpo').innerHTML = vis.length ? vis.map((l, i) => '<tr><td>' + medalha(i) + '</td><td><strong>' + bbEsc(l.atleta) + '</strong></td><td>' + escudoTime(l) + '</td><td>' + bbEsc(l.uf) + '</td><td style="white-space:nowrap">' + bbEsc(bbCat('Sub ' + l.sub)) + (l.naipe === 'F' ? ' F' : l.naipe === 'X' ? ' misto' : '') + '</td><td>' + bbEsc(l.jogos) + '</td><td><strong>' + bbEsc(l.pontos) + '</strong></td><td>' + bbEsc(l.media) + '</td><td style="font-size:13px;color:#4A5675">' + bbEsc(l.fed + (l.camp ? ' · ' + l.camp : '')) + (/soma do basquete brasil/i.test(l.fonte) ? '<br>soma nossa jogo a jogo (parcial)' : '') + '</td></tr>').join('')
       : '<tr><td colspan="9" style="color:#4A5675">' + (camp === 'CBI' && !base().length ? 'Os cestinhas do CBI ainda não foram lançados no nosso backup.' : 'Nenhum atleta com esses filtros.') + '</td></tr>';
     $('rkInfo').textContent = f.length ? f.length + ' atletas' + (vis.length < f.length ? ' · mostrando os 10 primeiros' : '') : '';
     $('rkMais').style.display = f.length > 10 ? '' : 'none'; $('rkMais').textContent = todos ? 'Mostrar só os 10 primeiros ↑' : 'Ver ranking completo →';
@@ -352,7 +362,10 @@ select{font:inherit}
   $('rkMais').addEventListener('click', e => { e.preventDefault(); todos = !todos; mostrar(); });
   bbApi({ acao: 'ranking' }).then(r => {
     if (!r || !r.ok) { $('rkCorpo').innerHTML = '<tr><td colspan="9" style="color:#4A5675">Ranking indisponível no momento.</td></tr>'; return; }
-    LIN = r.linhas || []; filtros(); mostrar();
+    LIN = r.linhas || []; filtros();
+    /* Ao abrir: CBI, todos os estados, Sub-15 (o CBI é o mais difícil de achar em outro lugar) */
+    if ($('rkCamp').value === 'CBI' && [...$('rkCat').options].some(o => o.value === '15')) $('rkCat').value = '15';
+    mostrar();
   });
 })();
 
