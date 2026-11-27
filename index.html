@@ -107,7 +107,8 @@ select{font:inherit}
 <span style="font-size:13px;color:#4A5675">Fonte de cada número: súmula da federação ou estatística do narrador</span>
 </div>
 <div role="tablist" aria-label="Fundamento" style="display:flex;flex-wrap:wrap;gap:8px">
-<button type="button" role="tab" aria-selected="true" style="min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#002776;color:#FFFFFF;font:inherit;font-weight:600">Pontos</button>
+<button type="button" role="tab" data-ordem="pontos" aria-selected="false" title="Ordena pelo total de pontos" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500">Pontos</button>
+<button type="button" role="tab" data-ordem="media" aria-selected="true" title="Ordena pela média de pontos por jogo" style="min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#002776;color:#FFFFFF;font:inherit;font-weight:600">Média de pontos</button>
 <button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Rebotes</button>
 <button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Assistências</button>
 <button type="button" role="tab" aria-selected="false" disabled title="Em breve: as federações ainda não publicam este número" style="min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9D0DE;background:#FFFFFF;color:#0B1B3F;font:inherit;font-weight:500;opacity:.45;cursor:not-allowed">Tocos</button>
@@ -323,7 +324,7 @@ select{font:inherit}
 <script>
 /* Ranking de cestinhas: Campeonato (Estaduais | CBI) separa as bases; pontos do CBI nunca somam no estadual */
 (function () {
-  let LIN = [], todos = false;
+  let LIN = [], todos = false, ordem = 'media';
   const $ = id => document.getElementById(id);
   const num = x => { const n = parseFloat(String(x).replace(',', '.')); return isNaN(n) ? -1 : n; };
   const medalha = i => i < 3 ? '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:' + ['#FFDF00', '#DCE1EA', '#F0D9C2'][i] + ';color:' + ['#002776', '#0B1B3F', '#5A3410'][i] + ';font-weight:700;align-items:center;justify-content:center">' + (i + 1) + '</span>' : '<span style="padding-left:9px">' + (i + 1) + '</span>';
@@ -346,7 +347,8 @@ select{font:inherit}
   function mostrar() {
     const uf = $('rkUf').value, cat = $('rkCat').value, nai = $('rkNaipe').value, tm = $('rkTime').value, nome = bbChave($('rkNome').value);
     const f = base().filter(l => (!uf || l.uf === uf) && (!cat || l.sub === +cat) && (!nai || l.naipe === nai || l.naipe === 'X') && (!tm || bbNomeLimpo(l.clube) === tm) && (!nome || bbChave(l.atleta).includes(nome)))
-      .sort((a, b) => num(b.media) - num(a.media) || num(b.pontos) - num(a.pontos)); /* ordem pela média; empate: mais pontos */
+      .sort(ordem === 'pontos' ? (a, b) => num(b.pontos) - num(a.pontos) || num(b.media) - num(a.media) /* total de pontos; empate: maior média */
+                               : (a, b) => (num(a.jogos) === 1) - (num(b.jogos) === 1) || num(b.media) - num(a.media) || num(b.pontos) - num(a.pontos)); /* média: primeiro quem tem 2 jogos ou mais, depois quem tem 1 jogo só; empate: mais pontos */
     const camp = $('rkCamp').value === 'CBI' ? 'CBI' : 'Estaduais';
     $('rkTitulo').textContent = 'Ranking nacional · ' + camp + (cat ? ' · Sub-' + cat : '') + (nai ? (nai === 'M' ? ' masculino' : ' feminino') : '') + (uf ? ' · ' + uf : '');
     const vis = todos ? f : f.slice(0, 10);
@@ -359,6 +361,12 @@ select{font:inherit}
   ['rkCat', 'rkNaipe', 'rkTime'].forEach(id => $(id).addEventListener('change', () => { todos = false; mostrar(); }));
   $('rkBuscar').addEventListener('click', () => { todos = false; mostrar(); document.getElementById('rankings').scrollIntoView({ behavior: 'smooth' }); });
   $('rkNome').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('rkBuscar').click(); } });
+  /* Botões Pontos | Média de pontos: trocam a ordem do ranking */
+  document.querySelectorAll('[data-ordem]').forEach(bt => bt.addEventListener('click', () => {
+    ordem = bt.dataset.ordem;
+    document.querySelectorAll('[data-ordem]').forEach(b => { const a = b === bt; b.setAttribute('aria-selected', a); b.style.background = a ? '#002776' : '#FFFFFF'; b.style.color = a ? '#FFFFFF' : '#0B1B3F'; b.style.border = a ? '0' : '1px solid #C9D0DE'; b.style.fontWeight = a ? '600' : '500'; });
+    todos = false; mostrar();
+  }));
   $('rkMais').addEventListener('click', e => { e.preventDefault(); todos = !todos; mostrar(); });
   bbApi({ acao: 'ranking' }).then(r => {
     if (!r || !r.ok) { $('rkCorpo').innerHTML = '<tr><td colspan="9" style="color:#4A5675">Ranking indisponível no momento.</td></tr>'; return; }
